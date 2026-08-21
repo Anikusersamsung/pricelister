@@ -17,7 +17,6 @@
         "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.39.0"
       }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -38,22 +37,27 @@
             </div>
 
             <div class="nav-menu">
-                <div class="nav-item active" id="nav-dashboard" data-target="view-dashboard">📊 Overview</div>
-                <div class="nav-item" id="nav-workspace" data-target="view-workspace">🛡️ Workspace</div>
-                <div class="nav-item" id="nav-products" data-target="view-products">📦 Products</div>
-                <div class="nav-item" id="nav-category" data-target="view-categories">🏷️ Categories</div>
-                <div class="nav-item" id="nav-invoices" data-target="view-invoices">📄 Invoices</div>
-                <div class="nav-item" id="nav-clients" data-target="view-clients">👥 Clients</div>
-                <div class="nav-item" id="nav-business" data-target="view-business">🏢 Business</div>
+                <div class="nav-group-title">🏢 Workspace</div>
+                <div class="nav-item sub-item active" id="nav-workspace" data-target="view-workspace">Management</div>
+                <div class="nav-item sub-item" id="nav-products" data-target="view-products">Products</div>
+                <div class="nav-item sub-item" id="nav-invoices" data-target="view-invoices">Invoices</div>
+                <div class="nav-item sub-item" id="nav-category" data-target="view-categories">Categories</div>
+                <div class="nav-item sub-item" id="nav-clients" data-target="view-clients">Clients</div>
+                <div class="nav-item sub-item" id="nav-business" data-target="view-business">Businesses</div>
             </div>
         </aside>
+        <div class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('open')"></div>
 
         <!-- Main Workspace -->
         <main class="main-content">
             <!-- Top Navigation / Breadcrumbs -->
             <header class="top-bar">
-                <div class="breadcrumb" style="font-weight: 500; color: var(--text-muted);">
-                    Workspace / <span id="currentViewText" style="color: var(--text-dark);">Overview</span>
+                <div style="display:flex; align-items:center;">
+                    <button class="mobile-menu-btn"
+                        onclick="document.querySelector('.sidebar').classList.add('open')">☰</button>
+                    <div class="breadcrumb" style="font-weight: 500; color: var(--text-muted);">
+                        Workspace / <span id="currentViewText" style="color: var(--text-dark);">Management</span>
+                    </div>
                 </div>
                 <div class="user-controls" style="display: flex; align-items: center; gap: 16px;">
                     <span id="userEmailDisplay" style="font-size: 13px; color: var(--text-muted);"></span>
@@ -61,58 +65,8 @@
                 </div>
             </header>
 
-            <div class="page-content" id="mainContainer">
+            <div class="page-content">
                 <div id="loadingIndicator" class="loader" style="margin-top: 50px;"></div>
-
-                <!-- VIEW: DASHBOARD -->
-                <div id="view-dashboard" class="view-panel active">
-                    <div class="page-header-container">
-                        <h1>Workspace Overview</h1>
-                        <div>
-                            <button class="btn btn-primary"
-                                onclick="switchView('view-invoice-form', 'Create Invoice')">+ Quick Invoice</button>
-                            <button class="btn btn-outline" onclick="switchView('view-product-form', 'Add Product')">+
-                                Add Product</button>
-                        </div>
-                    </div>
-
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-title">Total Products</div>
-                            <div class="metric-value" id="dash_prod_count">0</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-title">Total Invoices</div>
-                            <div class="metric-value" id="dash_inv_count">0</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-title">Categories</div>
-                            <div class="metric-value" id="dash_cat_count">0</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-title">Clients</div>
-                            <div class="metric-value" id="dash_client_count">0</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-title">Businesses</div>
-                            <div class="metric-value" id="dash_biz_count">0</div>
-                        </div>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="chart-container-card">
-                            <h3 style="margin-bottom:16px;">Entity Distribution</h3>
-                            <canvas id="entityChart" height="250"></canvas>
-                        </div>
-                        <div class="chart-container-card">
-                            <h3 style="margin-bottom:16px;">Recent Analytics Placeholder</h3>
-                            <div
-                                style="height: 250px; display: flex; align-items:center; justify-content:center; color: var(--text-muted); background: #F9F9F9; border-radius: 4px;">
-                                [ Financial / Revenue Graph goes here ]
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- VIEW: WORKSPACE MEMBERS -->
                 <div id="view-workspace" class="view-panel">
@@ -486,31 +440,32 @@
 
         let activeWorkspaceId = null;
 
-        // --- View Manager ---
-        const navItems = document.querySelectorAll('.nav-item');
-        const viewPanels = document.querySelectorAll('.view-panel');
+        // --- Navigation SPA logic ---
+        window.switchView = function (viewId, breadcrumbText) {
+            document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
-        function switchView(viewId, title) {
-            // Hide all panels
-            viewPanels.forEach(p => p.classList.remove('active'));
-            // Remove active states on nav
-            navItems.forEach(n => n.classList.remove('active'));
-            // Show target
-            document.getElementById(viewId).classList.add('active');
+            const panel = document.getElementById(viewId);
+            if (panel) panel.classList.add('active');
 
-            // Highlight nav if matches
-            const matchingNav = document.querySelector(`.nav-item[data-target="${viewId}"]`);
-            if (matchingNav) matchingNav.classList.add('active');
+            const navItem = document.querySelector(`.nav-item[data-target="${viewId}"]`);
+            if (navItem) navItem.classList.add('active');
 
-            if (title) currentViewText.innerText = title;
-        }
+            if (breadcrumbText) {
+                // Strip emoji for clean breadcrumb
+                document.getElementById('currentViewText').innerText = breadcrumbText.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '').replace(/[^\x00-\x7F]/g, '').trim();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        // Attach Nav events
-        navItems.forEach(item => {
+            // On mobile, auto-close sidebar on click
+            document.querySelector('.sidebar').classList.remove('open');
+        };
+
+        // Attach Nav events directly (modules run deferred, so DOM is ready)
+        document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', () => {
                 const target = item.getAttribute('data-target');
-                const title = item.innerText.split(' ').slice(1).join(' '); // Strip emoji
-                switchView(target, title);
+                if (target) window.switchView(target, item.innerText);
             });
         });
 
@@ -577,14 +532,18 @@
                     renderProductsList();
                 });
                 initExtraListeners();
+
+                // Hide loader and default to Management
+                loadingIndicator.style.display = 'none';
+                window.switchView('view-workspace', 'Management');
+
             } catch (error) {
                 console.error("Error loading workspace:", error);
+                loadingIndicator.style.display = 'none';
             }
         }
 
         function renderProductsList() {
-            loadingIndicator.style.display = 'none';
-            switchView('view-products', 'Products');
             dataBody.innerHTML = '';
 
             if (productsData.length === 0) {
@@ -985,78 +944,13 @@
 
         // --- Init Listeners ---
         function initExtraListeners() {
-            listenToCategories(activeWorkspaceId, (data) => { categoriesData = data; renderCategoriesList(); updateDashboardMetrics(); });
-            listenToClients(activeWorkspaceId, (data) => { clientsData = data; renderClientsList(); updateDashboardMetrics(); });
-            listenToBusinessProfiles(activeWorkspaceId, (data) => { businessData = data; renderBusinessList(); updateDashboardMetrics(); });
-            listenToInvoices(activeWorkspaceId, false, (data) => { invoicesData = data; renderInvoicesList(); updateDashboardMetrics(); }); // Listen to client invoices
+            listenToCategories(activeWorkspaceId, (data) => { categoriesData = data; renderCategoriesList(); });
+            listenToClients(activeWorkspaceId, (data) => { clientsData = data; renderClientsList(); });
+            listenToBusinessProfiles(activeWorkspaceId, (data) => { businessData = data; renderBusinessList(); });
+            listenToInvoices(activeWorkspaceId, false, (data) => { invoicesData = data; renderInvoicesList(); }); // Listen to client invoices
         }
 
-        // --- DASHBOARD LOGIC ---
-        let entityChartInstance = null;
 
-        function updateDashboardMetrics() {
-            // Check if DOM is ready
-            const prodEl = document.getElementById('dash_prod_count');
-            if (!prodEl) return;
-
-            prodEl.innerText = productsData.length;
-            document.getElementById('dash_inv_count').innerText = invoicesData.length;
-            document.getElementById('dash_cat_count').innerText = categoriesData.length;
-            document.getElementById('dash_client_count').innerText = clientsData.length;
-            document.getElementById('dash_biz_count').innerText = businessData.length;
-
-            updateDashboardGraph();
-        }
-
-        function updateDashboardGraph() {
-            const ctx = document.getElementById('entityChart');
-            if (!ctx) return;
-
-            const dataCounts = [productsData.length, invoicesData.length, categoriesData.length, clientsData.length, businessData.length];
-
-            if (entityChartInstance) {
-                entityChartInstance.data.datasets[0].data = dataCounts;
-                entityChartInstance.update();
-                return;
-            }
-
-            entityChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Products', 'Invoices', 'Categories', 'Clients', 'Business'],
-                    datasets: [{
-                        label: 'Workspace Entities',
-                        data: dataCounts,
-                        backgroundColor: [
-                            'rgba(211, 47, 47, 0.8)', // Primary Red
-                            'rgba(33, 150, 243, 0.8)', // Blue
-                            'rgba(76, 175, 80, 0.8)', // Green
-                            'rgba(255, 152, 0, 0.8)', // Orange
-                            'rgba(156, 39, 176, 0.8)' // Purple
-                        ],
-                        borderWidth: 0,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { precision: 0 } }
-                    }
-                }
-            });
-        }
-
-        // Ensure products listener updates metrics too (monkeypatch or hook):
-        const originalRenderProductsList = renderProductsList;
-        renderProductsList = function () {
-            originalRenderProductsList();
-            updateDashboardMetrics();
-        };
         // --- WORKSPACE ROLE & MEMBERS LOGIC ---
         let workersData = [];
         let currentWorkspaceInfo = null;
