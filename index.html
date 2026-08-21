@@ -8,7 +8,6 @@
     <title>Price Lister | Organize effortlessly</title>
     <link rel="stylesheet" href="theme.css">
 
-    <!-- Import Maps for ES Modules (Firebase / Supabase CDN) -->
     <script type="importmap">
     {
       "imports": {
@@ -20,55 +19,760 @@
       }
     }
     </script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            line-height: 1.6;
+        }
+
+        /* ========== HEADER ========== */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #0f172a;
+            font-weight: 700;
+            font-size: 1.15rem;
+        }
+
+        .logo-link img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #475569;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+
+        .nav-links a:hover { color: #0f172a; }
+
+        .btn-header {
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-outline:hover { background: #f1f5f9; }
+
+        .btn-primary {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .btn-primary:hover { background: #1d4ed8; }
+
+        /* ========== HERO ========== */
+        .hero {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 80px 24px 60px;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 999px;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-bottom: 18px;
+            color: #0f172a;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: #64748b;
+            max-width: 560px;
+            margin: 0 auto 32px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-lg {
+            padding: 14px 28px;
+            font-size: 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-lg.btn-primary {
+            background: #2563eb;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-lg.btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .btn-lg.btn-outline {
+            background: #fff;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-lg.btn-outline:hover { background: #f8fafc; }
+
+        /* ========== FEATURES ========== */
+        .features {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .section-title h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 1.05rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 28px;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .feature-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: #eff6ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            color: #2563eb;
+        }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 650;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        /* ========== HOW IT WORKS ========== */
+        .how-it-works {
+            background: #fff;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 80px 24px;
+        }
+
+        .how-inner {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 32px;
+            margin-top: 48px;
+        }
+
+        .step {
+            text-align: center;
+        }
+
+        .step-num {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: #fff;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 0.95rem;
+        }
+
+        .step h3 {
+            font-size: 1.05rem;
+            margin-bottom: 6px;
+        }
+
+        .step p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        /* ========== CTA ========== */
+        .cta-section {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 80px 24px;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 1.85rem;
+            font-weight: 750;
+            margin-bottom: 12px;
+        }
+
+        .cta-section p {
+            color: #64748b;
+            margin-bottom: 28px;
+            font-size: 1.05rem;
+        }
+
+        /* ========== FOOTER ========== */
+        .site-footer {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 48px 24px 28px;
+        }
+
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-brand .logo-link {
+            color: #f8fafc;
+        }
+
+        .footer-brand p {
+            font-size: 0.9rem;
+            max-width: 260px;
+        }
+
+        .footer-col h4 {
+            color: #f1f5f9;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .footer-col a {
+            display: block;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            transition: color 0.15s;
+        }
+
+        .footer-col a:hover { color: #e2e8f0; }
+
+        .footer-bottom {
+            max-width: 1100px;
+            margin: 36px auto 0;
+            padding-top: 20px;
+            border-top: 1px solid #1e293b;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        /* ========== LOGIN MODAL ========== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 24px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .login-card {
+            background: #fff;
+            width: 100%;
+            max-width: 400px;
+            padding: 40px 36px;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            position: relative;
+            animation: modalIn 0.25s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.96) translateY(8px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: #94a3b8;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px;
+        }
+
+        .modal-close:hover { color: #0f172a; }
+
+        .login-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .login-brand img {
+            width: 56px;
+            height: 56px;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        .login-brand h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .login-brand p {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .btn-google {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 13px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #0f172a;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .btn-google:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 16px 0;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .btn-test {
+            width: 100%;
+            padding: 11px 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 10px;
+            border: 1px dashed #cbd5e1;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-test:hover {
+            border-color: #94a3b8;
+            color: #334155;
+            background: #f8fafc;
+        }
+
+        .loader {
+            width: 28px;
+            height: 28px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 18px auto 0;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #errorMsg {
+            margin-top: 14px;
+            font-size: 0.875rem;
+            color: #dc2626;
+            min-height: 1.2em;
+        }
+
+        .login-footer-note {
+            margin-top: 24px;
+            font-size: 0.78rem;
+            color: #94a3b8;
+        }
+
+        /* Mobile */
+        @media (max-width: 700px) {
+            .nav-links a:not(.btn-header) { display: none; }
+            .footer-inner { grid-template-columns: 1fr; gap: 28px; }
+            .hero { padding: 56px 20px 40px; }
+        }
+    </style>
 </head>
 
 <body>
 
-    <main class="hero container glass-card" style="margin-top: 50px; text-align: center;">
-        <h1>Price Lister</h1>
-        <p>The premium business application to list, organize, and manage your products and client invoices seamlessly
-            from any device.</p>
+    <!-- ==================== HEADER ==================== -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="#" class="logo-link">
+                <img src="pricelister_logo.png" alt="Price Lister">
+                Price Lister
+            </a>
 
-        <button id="loginBtn" class="btn-primary">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    fill="#4285F4" />
-                <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853" />
-                <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    fill="#FBBC05" />
-                <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335" />
-            </svg>
-            Sign in with Google
-        </button>
-        <div id="loadingIndicator" class="loader" style="display: none;"></div>
-        <p id="errorMsg" style="color: var(--primary-color); margin-top: 10px;"></p>
-    </main>
+            <nav class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how">How it works</a>
+                <button class="btn-header btn-outline" id="openLoginBtn">Sign in</button>
+                <button class="btn-header btn-primary" id="openLoginBtnPrimary">Get started</button>
+            </nav>
+        </div>
+    </header>
 
-    <!-- App Logic -->
+    <!-- ==================== HERO ==================== -->
+    <section class="hero">
+        <div class="hero-badge">Inventory · Invoices · Clients</div>
+        <h1>Organize your business<br>effortlessly</h1>
+        <p>
+            Price Lister is the premium tool to list products, manage inventory,
+            and create professional client invoices — from any device.
+        </p>
+        <div class="hero-actions">
+            <button class="btn-lg btn-primary" id="heroCta">Start free →</button>
+            <a href="#features" class="btn-lg btn-outline" style="text-decoration:none;">View work</a>
+        </div>
+    </section>
+
+    <!-- ==================== FEATURES ==================== -->
+    <section class="features" id="features">
+        <div class="section-title">
+            <h2>Everything you need to run your catalog</h2>
+            <p>Built for freelancers, shops, and small teams who want clarity.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                </div>
+                <h3>Product Catalog</h3>
+                <p>Create and organize your entire product list with prices, categories, and notes in seconds.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                </div>
+                <h3>Smart Invoices</h3>
+                <p>Generate clean, professional invoices for clients and keep track of every transaction.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <h3>Works Everywhere</h3>
+                <p>Fully responsive. Manage your business from desktop, tablet, or phone without missing a beat.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== HOW IT WORKS ==================== -->
+    <section class="how-it-works" id="how">
+        <div class="how-inner">
+            <div class="section-title">
+                <h2>How it works</h2>
+                <p>Three simple steps to get organized.</p>
+            </div>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <h3>Sign in</h3>
+                    <p>Continue with your Google account in one click. No complicated forms.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <h3>Add your products</h3>
+                    <p>Build your catalog with names, prices, and categories. Fast and flexible.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <h3>Invoice clients</h3>
+                    <p>Select items, generate invoices, and keep everything in one place.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FINAL CTA ==================== -->
+    <section class="cta-section">
+        <h2>Ready to organize your business?</h2>
+        <p>Join Price Lister today and manage products & invoices with ease.</p>
+        <button class="btn-lg btn-primary" id="bottomCta">Get started free →</button>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <a href="#" class="logo-link">
+                    <img src="pricelister_logo.png" alt="Price Lister" style="width:32px;height:32px;">
+                    Price Lister
+                </a>
+                <p>The complete business inventory and invoice management app.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Product</h4>
+                <a href="#features">Features</a>
+                <a href="#how">How it works</a>
+                <a href="#" id="footerLogin">Sign in</a>
+            </div>
+
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © 2026 Price Lister. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- ==================== LOGIN MODAL ==================== -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-card">
+            <button class="modal-close" id="closeModal" aria-label="Close">×</button>
+
+            <div class="login-brand">
+                <img src="pricelister_logo.png" alt="Price Lister">
+                <h2>Welcome back</h2>
+                <p>Sign in to continue to Price Lister</p>
+            </div>
+
+            <button id="loginBtn" class="btn-google">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                Continue with Google
+            </button>
+
+            <div class="divider">or</div>
+
+            <button id="testBtn" class="btn-test">Continue in Test Mode</button>
+
+            <div id="loadingIndicator" class="loader" style="display:none;"></div>
+            <p id="errorMsg"></p>
+
+            <p class="login-footer-note">
+                By continuing, you agree to our Terms of Service and Privacy Policy.
+            </p>
+        </div>
+    </div>
+
+    <!-- ==================== APP LOGIC ==================== -->
     <script type="module">
         import { auth, googleProvider, signInWithPopup, onAuthStateChanged } from "./firebaseConfig.js";
 
-        const loginBtn = document.getElementById('loginBtn');
+        const loginModal     = document.getElementById('loginModal');
+        const loginBtn       = document.getElementById('loginBtn');
+        const testBtn        = document.getElementById('testBtn');
         const loadingIndicator = document.getElementById('loadingIndicator');
-        const errorMsg = document.getElementById('errorMsg');
+        const errorMsg       = document.getElementById('errorMsg');
+        const closeModal     = document.getElementById('closeModal');
 
-        // Check if already logged in
+        // Buttons that open the login modal
+        const openTriggers = [
+            document.getElementById('openLoginBtn'),
+            document.getElementById('openLoginBtnPrimary'),
+            document.getElementById('heroCta'),
+            document.getElementById('bottomCta'),
+            document.getElementById('footerLogin')
+        ];
+
+        function openLogin() {
+            loginModal.classList.add('active');
+            errorMsg.innerText = '';
+        }
+
+        function closeLogin() {
+            loginModal.classList.remove('active');
+            // Reset UI state
+            loginBtn.style.display = 'inline-flex';
+            testBtn.style.display = 'block';
+            document.querySelector('.divider').style.display = 'flex';
+            loadingIndicator.style.display = 'none';
+        }
+
+        openTriggers.forEach(btn => btn?.addEventListener('click', openLogin));
+        closeModal.addEventListener('click', closeLogin);
+
+        // Close on overlay click
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) closeLogin();
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLogin();
+        });
+
+        // ========== AUTH CHECK ==========
+        // If already logged in → go straight to app
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 window.location.href = "app.html";
             }
         });
 
+        // Test mode
+        testBtn.addEventListener('click', () => {
+            window.location.href = "app.html?testMode=true";
+        });
+
+        // Google Sign-in
         loginBtn.addEventListener('click', async () => {
             loginBtn.style.display = 'none';
+            testBtn.style.display = 'none';
+            document.querySelector('.divider').style.display = 'none';
             loadingIndicator.style.display = 'block';
             errorMsg.innerText = '';
+
             try {
                 const result = await signInWithPopup(auth, googleProvider);
                 if (result.user) {
@@ -76,8 +780,10 @@
                 }
             } catch (error) {
                 console.error("Login failed:", error);
-                errorMsg.innerText = "Error: " + error.code + " - " + error.message;
+                errorMsg.innerText = "Sign-in failed. Please try again.";
                 loginBtn.style.display = 'inline-flex';
+                testBtn.style.display = 'block';
+                document.querySelector('.divider').style.display = 'flex';
                 loadingIndicator.style.display = 'none';
             }
         });
