@@ -93,6 +93,14 @@ export async function saveInvoice(workspaceUid, invoice, isNew = false) {
   }
 }
 
+export async function deleteInvoice(workspaceUid, uniqueId, isBusiness = false) {
+  const colName = isBusiness ? "BusinessInvoices" : "Invoices";
+  const docRef = doc(db, "Workspaces", workspaceUid, colName, uniqueId);
+  await deleteDoc(docRef);
+  const wsRef = doc(db, "Workspaces", workspaceUid);
+  await updateDoc(wsRef, { adminInvoiceCount: increment(-1) });
+}
+
 // --- Realtime Categories Sync ---
 export function listenToCategories(workspaceUid, callback) {
   const catRef = collection(db, "Workspaces", workspaceUid, "Categories");
