@@ -102,3 +102,91 @@ export function listenToCategories(workspaceUid, callback) {
     callback(list);
   });
 }
+
+export async function saveCategory(workspaceUid, category, isNew = false) {
+  const docRef = doc(db, "Workspaces", workspaceUid, "Categories", category.uniqueId);
+  await setDoc(docRef, category, { merge: true });
+
+  if (isNew) {
+    const wsRef = doc(db, "Workspaces", workspaceUid);
+    await updateDoc(wsRef, { adminCategoryCount: increment(1) });
+  }
+}
+
+export async function deleteCategory(workspaceUid, uniqueId) {
+  const docRef = doc(db, "Workspaces", workspaceUid, "Categories", uniqueId);
+  await deleteDoc(docRef);
+  const wsRef = doc(db, "Workspaces", workspaceUid);
+  await updateDoc(wsRef, { adminCategoryCount: increment(-1) });
+}
+
+// --- Clients Sync ---
+export function listenToClients(workspaceUid, callback) {
+  const ref = collection(db, "Workspaces", workspaceUid, "Clients");
+  return onSnapshot(ref, (snapshot) => {
+    const list = [];
+    snapshot.forEach((doc) => list.push(doc.data()));
+    callback(list);
+  });
+}
+
+export async function saveClient(workspaceUid, client, isNew = false) {
+  const docRef = doc(db, "Workspaces", workspaceUid, "Clients", client.uniqueId);
+  await setDoc(docRef, client, { merge: true });
+
+  if (isNew) {
+    const wsRef = doc(db, "Workspaces", workspaceUid);
+    await updateDoc(wsRef, { adminClientCount: increment(1) });
+  }
+}
+
+export async function deleteClient(workspaceUid, uniqueId) {
+  const docRef = doc(db, "Workspaces", workspaceUid, "Clients", uniqueId);
+  await deleteDoc(docRef);
+  const wsRef = doc(db, "Workspaces", workspaceUid);
+  await updateDoc(wsRef, { adminClientCount: increment(-1) });
+}
+
+// --- Businesses (BusinessProfile) Sync ---
+export function listenToBusinessProfiles(workspaceUid, callback) {
+  const ref = collection(db, "Workspaces", workspaceUid, "BusinessProfiles");
+  return onSnapshot(ref, (snapshot) => {
+    const list = [];
+    snapshot.forEach((doc) => list.push(doc.data()));
+    callback(list);
+  });
+}
+
+export async function saveBusinessProfile(workspaceUid, profile, isNew = false) {
+  const docRef = doc(db, "Workspaces", workspaceUid, "BusinessProfiles", profile.uniqueId);
+  await setDoc(docRef, profile, { merge: true });
+
+  if (isNew) {
+    const wsRef = doc(db, "Workspaces", workspaceUid);
+    await updateDoc(wsRef, { adminBusinessCount: increment(1) });
+  }
+}
+
+export async function deleteBusinessProfile(workspaceUid, uniqueId) {
+  const docRef = doc(db, "Workspaces", workspaceUid, "BusinessProfiles", uniqueId);
+  await deleteDoc(docRef);
+  const wsRef = doc(db, "Workspaces", workspaceUid);
+  await updateDoc(wsRef, { adminBusinessCount: increment(-1) });
+}
+
+// --- Workers & Workspace Management Sync ---
+export function listenToWorkers(workspaceUid, callback) {
+  const ref = collection(db, "Workspaces", workspaceUid, "Workers");
+  return onSnapshot(ref, (snapshot) => {
+    const list = [];
+    snapshot.forEach((doc) => list.push(doc.data()));
+    callback(list);
+  });
+}
+
+export function listenToWorkspaceInfo(workspaceUid, callback) {
+  const ref = doc(db, "Workspaces", workspaceUid);
+  return onSnapshot(ref, (doc) => {
+    if (doc.exists()) callback(doc.data());
+  });
+}
