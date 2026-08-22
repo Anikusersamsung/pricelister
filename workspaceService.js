@@ -12,31 +12,76 @@ import {
   where
 } from "firebase/firestore";
 
-// --- Resolve Workspace UID (Gatekeeper logic) ---
-export async function getActiveWorkspaceUid(userUid) {
-  try {
-    const connectionSnap = await getDoc(doc(db, "Connections", userUid));
-    if (connectionSnap.exists() && connectionSnap.data().adminUid) {
-      return connectionSnap.data().adminUid;
-    }
-  } catch (err) {
-    console.warn("Connection lookup warning:", err);
+// --- Android-aligned Unique ID Generator ---
+export function generateUniqueId(prefix = "") {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let randomStr = "";
+  for (let i = 0; i < 8; i++) {
+    randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return userUid;
+  const timestamp = Date.now().toString(36);
+  return prefix ? `${prefix}_${timestamp}${randomStr}` : `${timestamp}${randomStr}`;
 }
 
-// --- Create / Initialize Workspace ---
-export async function createWorkspace(userUid, { name, description = "", adminEmail = "", currency = "USD" }) {
+// --- Check User Workspace Connection Status ---
+export async function checkUserWorkspaceStatus(userUid) {
+  try {
+    // 1. Check Connections doc
+    const connSnap = await getDoc(doc(db, "Connections", userUid));
+    if (connSnap.exists()) {
+      const connData = connSnap.data();
+      const adminUid = connData.adminUid || connData.workspaceId || userUid;
+      const role = connData.role || (adminUid === userUid ? "Admin" : "Staff");
+      return {
+        isConnected: true,
+        workspaceUid: adminUid,
+        role: role,
+        isOwner: adminUid === userUid || Boolean(connData.isOwner)
+      };
+    }
+
+    // 2. Check if user has an existing Workspace doc
+    const wsSnap = await getDoc(doc(db, "Workspaces", userUid));
+    if (wsSnap.exists()) {
+      return {
+        isConnected: true,
+        workspaceUid: userUid,
+        role: "Admin",
+        isOwner: true
+      };
+    }
+  } catch (err) {
+    console.warn("checkUserWorkspaceStatus error:", err);
+  }
+
+  // Not connected to any workspace yet
+  return {
+    isConnected: false,
+    workspaceUid: null,
+    role: null,
+    isOwner: false
+  };
+}
+
+// --- Resolve Workspace UID ---
+export async function getActiveWorkspaceUid(userUid) {
+  const status = await checkUserWorkspaceStatus(userUid);
+  return status.isConnected ? status.workspaceUid : null;
+}
+
+// --- Create / Initialize Workspace (Strictly matching Android Workspace Model) ---
+export async function createWorkspace(userUid, { name, description = "", adminEmail = "" }) {
   const wsRef = doc(db, "Workspaces", userUid);
   const connRef = doc(db, "Connections", userUid);
 
+  // Exact fields matching Android Workspace model (id, name, description, adminUid, adminEmail)
   const wsData = {
     workspaceId: userUid,
-    adminUid: userUid,
-    adminEmail: adminEmail,
+    id: userUid,
     name: name.trim(),
     description: description.trim(),
-    currency: currency,
+    adminUid: userUid,
+    adminEmail: adminEmail,
     createdAt: Date.now(),
     adminProductCount: 0,
     adminInvoiceCount: 0,
@@ -57,6 +102,15 @@ export async function createWorkspace(userUid, { name, description = "", adminEm
   }, { merge: true });
 
   return wsData;
+}
+
+// --- Update Workspace (Admin Only) ---
+export async function updateWorkspace(workspaceUid, { name, description }) {
+  const wsRef = doc(db, "Workspaces", workspaceUid);
+  const updates = {};
+  if (name !== undefined) updates.name = name.trim();
+  if (description !== undefined) updates.description = description.trim();
+  await updateDoc(wsRef, updates);
 }
 
 // --- Ensure Workspace Exists for Authenticated User ---
