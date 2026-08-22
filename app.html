@@ -28,9 +28,7 @@
             <div class="sidebar-header">
                 <div class="sidebar-brand">
                     <div class="brand-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                        </svg>
+                        <img src="pricelister_logo.png" alt="" width="40" height="40">
                     </div>
                     <span>PriceLister</span>
                 </div>
@@ -140,6 +138,9 @@
                 </div>
 
                 <div class="top-bar-actions">
+                    <button id="themeToggleBtn" class="btn btn-outline btn-sm" title="Toggle Light/Dark Theme" style="padding:6px 10px;">
+                        <span id="themeToggleIcon">🌙</span>
+                    </button>
                     <div class="ws-pill-badge" id="wsPillBadge" style="cursor:pointer;" onclick="window.switchView('view-workspace', 'Workspace Settings')">
                         <span class="dot"></span>
                         <span id="topWsName">My Workspace</span>
@@ -160,50 +161,95 @@
 
                 <!-- ================= VIEW 1: OVERVIEW DASHBOARD ================= -->
                 <div id="view-overview" class="view-panel active">
-                    <div class="page-header-container">
+                    <!-- Top Welcome & Live Status Header -->
+                    <div class="welcome-banner">
                         <div>
-                            <h1 class="page-title">Workspace Overview</h1>
-                            <p class="page-subtitle">Real-time inventory valuation, stock warnings, and invoice performance.</p>
+                            <div class="welcome-greeting-title">
+                                <span id="dashGreeting">👋 Welcome to</span>
+                                <span id="dashWsTitle" style="color:var(--primary);">Price Lister</span>
+                            </div>
+                            <p style="font-size:13px; color:var(--text-muted); margin-top:4px;" id="dashLiveStatusText">
+                                Synchronized real-time inventory management, financial analytics, and billing records.
+                            </p>
                         </div>
-                        <div class="header-controls">
-                            <button class="btn btn-secondary" onclick="openProductForm()">
+                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <div style="display:flex; background:var(--bg-surface); padding:3px; border-radius:var(--radius-full); border:1px solid var(--border-color); gap:4px;">
+                                <button class="period-pill active" onclick="window.setDashboardPeriod('all', this)">All Time</button>
+                                <button class="period-pill" onclick="window.setDashboardPeriod('month', this)">This Month</button>
+                                <button class="period-pill" onclick="window.setDashboardPeriod('week', this)">This Week</button>
+                                <button class="period-pill" onclick="window.setDashboardPeriod('today', this)">Today</button>
+                            </div>
+                            <button class="btn btn-primary" onclick="window.openInvoiceForm()">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                <span>Add Product</span>
-                            </button>
-                            <button class="btn btn-primary" onclick="openInvoiceForm()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                <span>Create Invoice</span>
+                                <span>+ Create Invoice</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Metrics KPI Cards -->
-                    <div class="metrics-grid">
+                    <!-- Quick Command Bar -->
+                    <div style="display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap;">
+                        <button class="btn btn-secondary btn-sm" onclick="window.switchView('view-products', 'Products')">
+                            <span>📦 Products (<span id="cmd-prod-count">0</span>)</span>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="window.switchView('view-invoices', 'Invoices')">
+                            <span>🧾 Invoices (<span id="cmd-inv-count">0</span>)</span>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="window.switchView('view-categories', 'Categories')">
+                            <span>🏷️ Categories (<span id="cmd-cat-count">0</span>)</span>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="window.switchView('view-clients', 'Clients')">
+                            <span>👥 Contacts (<span id="cmd-client-count">0</span>)</span>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="window.switchView('view-business', 'Business Profiles')">
+                            <span>🏢 B2B Partners (<span id="cmd-biz-count">0</span>)</span>
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="window.openProductForm()">
+                            <span>+ Add Product</span>
+                        </button>
+                    </div>
+
+                    <!-- 6-Card KPI Command Matrix -->
+                    <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                        <!-- 1. Retail Valuation -->
                         <div class="metric-card">
                             <div class="metric-info">
-                                <span class="metric-label">Total Inventory Value</span>
+                                <span class="metric-label">Retail Inventory Value</span>
                                 <span class="metric-value" id="kpi-inventory-val">$0.00</span>
-                                <span class="metric-subtext">Estimated retail valuation</span>
+                                <span class="metric-subtext" id="kpi-inventory-units">0 total units in stock</span>
                             </div>
                             <div class="metric-icon-box">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                             </div>
                         </div>
 
+                        <!-- 2. Cost Investment -->
                         <div class="metric-card">
                             <div class="metric-info">
-                                <span class="metric-label">Active Products</span>
-                                <span class="metric-value" id="kpi-product-count">0</span>
-                                <span class="metric-subtext" id="kpi-categories-sub">0 categories</span>
+                                <span class="metric-label">Cost Capital Invested</span>
+                                <span class="metric-value" id="kpi-cost-val">$0.00</span>
+                                <span class="metric-subtext">Acquisition cost of stock</span>
                             </div>
                             <div class="metric-icon-box">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
                             </div>
                         </div>
 
+                        <!-- 3. Potential Profit Margin -->
                         <div class="metric-card">
                             <div class="metric-info">
-                                <span class="metric-label">Total Invoiced</span>
+                                <span class="metric-label">Projected Stock Profit</span>
+                                <span class="metric-value" id="kpi-profit-val" style="color:#10B981;">+$0.00</span>
+                                <span class="metric-subtext" id="kpi-margin-pct">+0% Gross Margin</span>
+                            </div>
+                            <div class="metric-icon-box" style="background:#ECFDF5; color:#10B981;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                            </div>
+                        </div>
+
+                        <!-- 4. Total Invoiced Revenue -->
+                        <div class="metric-card">
+                            <div class="metric-info">
+                                <span class="metric-label">Invoiced Revenue</span>
                                 <span class="metric-value" id="kpi-invoices-val">$0.00</span>
                                 <span class="metric-subtext" id="kpi-invoices-sub">0 invoices recorded</span>
                             </div>
@@ -212,11 +258,24 @@
                             </div>
                         </div>
 
+                        <!-- 5. Pending Receivables -->
                         <div class="metric-card">
                             <div class="metric-info">
-                                <span class="metric-label">Clients & Partners</span>
+                                <span class="metric-label">Pending / Unpaid Due</span>
+                                <span class="metric-value" id="kpi-unpaid-val" style="color:var(--danger);">$0.00</span>
+                                <span class="metric-subtext" id="kpi-unpaid-count">0 pending invoices</span>
+                            </div>
+                            <div class="metric-icon-box" style="background:#FEF2F2; color:var(--danger);">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            </div>
+                        </div>
+
+                        <!-- 6. Contacts & Network -->
+                        <div class="metric-card">
+                            <div class="metric-info">
+                                <span class="metric-label">Network Directory</span>
                                 <span class="metric-value" id="kpi-clients-count">0</span>
-                                <span class="metric-subtext">Customer network</span>
+                                <span class="metric-subtext" id="kpi-network-sub">0 clients · 0 businesses</span>
                             </div>
                             <div class="metric-icon-box">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
@@ -224,51 +283,133 @@
                         </div>
                     </div>
 
-                    <!-- Low Stock Alerts & Recent Invoices Grid -->
+                    <!-- Visual Analytics: 7-Day Revenue Flow & Stock Health -->
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; margin-bottom: 28px;">
+                        <!-- 7-Day Revenue Flow Chart -->
+                        <div class="dashboard-chart-container">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <h4 style="font-size:15px; font-weight:700; color:var(--text-main);">📈 7-Day Revenue & Invoicing Flow</h4>
+                                    <p style="font-size:12px; color:var(--text-muted); margin-top:2px;">Daily billing volume and realized totals</p>
+                                </div>
+                                <span class="badge badge-success" id="chartTotal7Days">$0.00 this week</span>
+                            </div>
+                            <div id="revenueChartContainer" style="margin-top:14px; min-height:160px; display:flex; align-items:flex-end; gap:12px; padding:10px 0;">
+                                <!-- Dynamic Chart Bars Generated via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Inventory Stock Health Breakdown -->
+                        <div class="dashboard-chart-container">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <h4 style="font-size:15px; font-weight:700; color:var(--text-main);">🩺 Inventory Stock Health</h4>
+                                    <p style="font-size:12px; color:var(--text-muted); margin-top:2px;">Stock levels across <span id="healthTotalProds">0</span> catalog items</p>
+                                </div>
+                                <button class="btn btn-outline btn-sm" style="font-size:11.5px; padding:3px 8px;" onclick="window.switchView('view-products', 'Products')">Filter View</button>
+                            </div>
+
+                            <!-- Segmented Progress Bar -->
+                            <div class="health-meter-bar" id="healthMeterBar">
+                                <div class="health-meter-seg" id="segGood" style="width:70%; background:#10B981;" title="In Stock"></div>
+                                <div class="health-meter-seg" id="segLow" style="width:20%; background:#F59E0B;" title="Low Stock"></div>
+                                <div class="health-meter-seg" id="segOut" style="width:10%; background:#EF4444;" title="Out of Stock"></div>
+                            </div>
+
+                            <!-- Health Legend Grid -->
+                            <div class="health-legend-grid">
+                                <div class="health-legend-card" style="border-left:3px solid #10B981;">
+                                    <div style="font-size:11px; color:var(--text-muted); font-weight:600;">🟢 Well Stocked (>5)</div>
+                                    <div style="font-size:18px; font-weight:800; color:var(--text-main); margin-top:2px;" id="countGoodStock">0</div>
+                                </div>
+                                <div class="health-legend-card" style="border-left:3px solid #F59E0B;">
+                                    <div style="font-size:11px; color:var(--text-muted); font-weight:600;">🟡 Low Stock (1-5)</div>
+                                    <div style="font-size:18px; font-weight:800; color:#F59E0B; margin-top:2px;" id="countLowStock">0</div>
+                                </div>
+                                <div class="health-legend-card" style="border-left:3px solid #EF4444;">
+                                    <div style="font-size:11px; color:var(--text-muted); font-weight:600;">🔴 Out of Stock (0)</div>
+                                    <div style="font-size:18px; font-weight:800; color:var(--danger); margin-top:2px;" id="countOutStock">0</div>
+                                </div>
+                                <div class="health-legend-card" style="border-left:3px solid var(--primary);">
+                                    <div style="font-size:11px; color:var(--text-muted); font-weight:600;">🎨 Variations</div>
+                                    <div style="font-size:18px; font-weight:800; color:var(--primary); margin-top:2px;" id="countVarTotal">0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3-Column Feeds Grid: Urgent Low Stock, Live Invoices, Top Stock Value -->
                     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px;">
+                        <!-- Low Stock Warnings with 1-Click Restock -->
                         <div class="content-card">
                             <div class="content-card-header">
                                 <div class="content-card-title">
-                                    <span style="color:var(--warning)">⚠️</span> Low Stock Warnings (&le; 5 units)
+                                    <span style="color:var(--warning)">⚠️</span> Low Stock & Urgent Reorder
                                 </div>
-                                <button class="btn btn-outline btn-sm" onclick="window.switchView('view-products', 'Products')">View All</button>
+                                <button class="btn btn-outline btn-sm" onclick="window.switchView('view-products', 'Products')">All Products</button>
                             </div>
                             <div class="data-table-container">
                                 <table class="data-table">
                                     <thead>
                                         <tr>
                                             <th>Product</th>
-                                            <th>Category</th>
                                             <th>Stock</th>
-                                            <th class="text-right">Price</th>
+                                            <th>Price</th>
+                                            <th class="text-right">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="lowStockBody">
-                                        <tr><td colspan="4" class="empty-state">No low stock items. Everything is well stocked!</td></tr>
+                                        <!-- Dynamically generated rows -->
                                     </tbody>
                                 </table>
                             </div>
                         </div>
 
+                        <!-- Recent Invoices Feed -->
                         <div class="content-card">
                             <div class="content-card-header">
                                 <div class="content-card-title">
-                                    <span>🧾</span> Recent Invoices
+                                    <span>🧾</span> Recent Invoicing Activity
                                 </div>
-                                <button class="btn btn-outline btn-sm" onclick="window.switchView('view-invoices', 'Invoices')">View All</button>
+                                <button class="btn btn-outline btn-sm" onclick="window.switchView('view-invoices', 'Invoices')">All Invoices</button>
                             </div>
                             <div class="data-table-container">
                                 <table class="data-table">
                                     <thead>
                                         <tr>
-                                            <th>Inv #</th>
-                                            <th>Customer</th>
+                                            <th>Invoice #</th>
+                                            <th>Recipient</th>
+                                            <th>Total</th>
                                             <th>Status</th>
-                                            <th class="text-right">Total</th>
                                         </tr>
                                     </thead>
                                     <tbody id="recentInvoicesBody">
-                                        <tr><td colspan="4" class="empty-state">No invoices yet.</td></tr>
+                                        <!-- Dynamically generated rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Top High-Value Inventory Ranking -->
+                        <div class="content-card">
+                            <div class="content-card-header">
+                                <div class="content-card-title">
+                                    <span>🏆</span> Highest Value Stock Items
+                                </div>
+                                <button class="btn btn-outline btn-sm" onclick="window.switchView('view-products', 'Products')">Catalog</button>
+                            </div>
+                            <div class="data-table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Stock</th>
+                                            <th>Margin</th>
+                                            <th class="text-right">Valuation</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="topInventoryBody">
+                                        <!-- Dynamically generated rows -->
                                     </tbody>
                                 </table>
                             </div>
@@ -283,10 +424,16 @@
                             <h1 class="page-title">Products Inventory</h1>
                             <p class="page-subtitle">Track pricing, stock quantities, variations, and profit margins.</p>
                         </div>
-                        <button class="btn btn-primary" onclick="openProductForm()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            <span>Add Product</span>
-                        </button>
+                        <div class="header-controls">
+                            <button class="btn btn-secondary" onclick="window.exportProductsCSV()">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                <span>Export CSV</span>
+                            </button>
+                            <button class="btn btn-primary" onclick="window.openProductForm()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>Add Product</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="content-card">
@@ -295,9 +442,16 @@
                                 <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                                 <input type="text" id="productSearchInput" class="search-input" placeholder="Search product name, barcode UPC...">
                             </div>
-                            <div class="filter-group">
+                            <div class="filter-group" style="display:flex; gap:8px; flex-wrap:wrap;">
                                 <select id="productCategoryFilter" class="input-control" style="width: auto; padding: 7px 12px;">
                                     <option value="">All Categories</option>
+                                </select>
+                                <select id="productStockFilter" class="input-control" style="width: auto; padding: 7px 12px;">
+                                    <option value="all">All Stock Levels</option>
+                                    <option value="in_stock">In Stock (>5)</option>
+                                    <option value="low_stock">Low Stock (1-5)</option>
+                                    <option value="out_of_stock">Out of Stock (0)</option>
+                                    <option value="has_variations">🎨 Has Variations</option>
                                 </select>
                             </div>
                         </div>
@@ -343,7 +497,7 @@
                                     <div class="form-group">
                                         <label class="input-label">
                                             <span>Category *</span>
-                                            <a href="javascript:void(0)" onclick="openCategoryForm()" style="font-size:12px; font-weight:600;">+ New Category</a>
+                                            <a href="javascript:void(0)" onclick="window.openCategoryForm()" style="font-size:12px; font-weight:600;">+ New Category</a>
                                         </label>
                                         <select id="p_category" class="input-control">
                                             <option value="">-- Select Category --</option>
@@ -428,29 +582,42 @@
                                     </div>
 
                                     <!-- PRODUCT VARIATIONS STUDIO -->
-                                    <div class="form-group col-span-full" style="background:#F8FAFC; border:1px solid var(--border-color); border-radius:var(--radius-lg); padding:20px; margin-top:8px;">
+                                    <div class="form-group col-span-full" style="background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:var(--radius-lg); padding:20px; margin-top:8px;">
                                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
                                             <div>
-                                                <h4 style="font-size:15px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:6px;">
-                                                    <span>🎨 Product Variations</span>
-                                                </h4>
-                                                <p style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">Add options like sizes (S, M, L), colors, flavours, or multi-packs with custom pricing & stock.</p>
+                                                <div style="display:flex; align-items:center; gap:8px;">
+                                                    <h4 style="font-size:15px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+                                                        <span>🎨 Product Variations</span>
+                                                    </h4>
+                                                    <span id="varCountSummary" style="font-size:11.5px; font-weight:700; color:var(--primary); background:var(--primary-light); padding:2px 8px; border-radius:20px;">0 Options</span>
+                                                </div>
+                                                <p style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">Add options like sizes (S, M, L), colors, weights, or multi-packs with custom pricing & stock.</p>
                                             </div>
                                             <button type="button" class="btn btn-secondary btn-sm" id="addVariationRowBtn">
-                                                + Add Variation Option
+                                                + Add Option
                                             </button>
                                         </div>
 
-                                        <div class="data-table-container" style="border:1px solid var(--border-color); border-radius:var(--radius-md); background:#fff;">
+                                        <!-- Quick Presets -->
+                                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+                                            <span style="font-size:11.5px; font-weight:600; color:var(--text-muted);">Quick Presets:</span>
+                                            <button type="button" class="var-preset-pill" onclick="applyVariationPreset('sizes')">🏷️ Sizes (S, M, L, XL)</button>
+                                            <button type="button" class="var-preset-pill" onclick="applyVariationPreset('weights')">⚖️ Weights (250g, 500g, 1kg)</button>
+                                            <button type="button" class="var-preset-pill" onclick="applyVariationPreset('colors')">🎨 Colors (Black, White, Blue, Red)</button>
+                                            <button type="button" class="var-preset-pill" onclick="applyVariationPreset('packs')">📦 Packs (1-Pack, 3-Pack, 6-Pack)</button>
+                                        </div>
+
+                                        <div class="data-table-container" style="border:1px solid var(--border-color); border-radius:var(--radius-md); background:var(--bg-surface);">
                                             <table class="data-table" id="variationsTable">
                                                 <thead>
                                                     <tr>
-                                                        <th style="min-width: 180px;">Variation Name / Spec</th>
-                                                        <th style="width: 140px;">SKU / Barcode</th>
-                                                        <th style="width: 110px;">Stock Qty</th>
-                                                        <th style="width: 120px;">Cost ($)</th>
-                                                        <th style="width: 120px;">Sale Price ($)</th>
-                                                        <th style="width: 60px;" class="text-right">Remove</th>
+                                                        <th style="min-width: 170px;">Variation Name / Option *</th>
+                                                        <th style="width: 130px;">SKU / Barcode</th>
+                                                        <th style="width: 100px;">Stock Qty</th>
+                                                        <th style="width: 105px;">Cost ($)</th>
+                                                        <th style="width: 105px;">Sale Price ($)</th>
+                                                        <th style="width: 105px;">MRP ($)</th>
+                                                        <th style="width: 50px;" class="text-right">Del</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="variationsTableBody">
@@ -482,7 +649,7 @@
                             <h1 class="page-title">Invoice Records</h1>
                             <p class="page-subtitle">Manage client bills, corporate orders, and track payment receipts.</p>
                         </div>
-                        <button class="btn btn-primary" onclick="openInvoiceForm()">
+                        <button class="btn btn-primary" onclick="window.openInvoiceForm()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             <span>Create Invoice</span>
                         </button>
@@ -496,8 +663,8 @@
                             </div>
                             <div class="filter-group">
                                 <div style="display:flex; background:var(--bg-subtle); border-radius:var(--radius-md); padding:3px; gap:4px;">
-                                    <button class="btn btn-sm" id="btn-inv-filter-all" style="background:#fff; box-shadow:var(--shadow-sm); color:var(--text-main);" onclick="filterInvoicesType('client')">Customer Invoices</button>
-                                    <button class="btn btn-sm" id="btn-inv-filter-biz" style="background:transparent; color:var(--text-muted);" onclick="filterInvoicesType('business')">Business B2B Invoices</button>
+                                    <button class="btn btn-sm" id="btn-inv-filter-all" style="background:#fff; box-shadow:var(--shadow-sm); color:var(--text-main);" onclick="window.filterInvoicesType('client')">Customer Invoices</button>
+                                    <button class="btn btn-sm" id="btn-inv-filter-biz" style="background:transparent; color:var(--text-muted);" onclick="window.filterInvoicesType('business')">Business B2B Invoices</button>
                                 </div>
                             </div>
                         </div>
@@ -742,10 +909,16 @@
                             <h1 class="page-title">Category Directory</h1>
                             <p class="page-subtitle">Organize and color-tag your product catalog for rapid filtering.</p>
                         </div>
-                        <button class="btn btn-primary" onclick="openCategoryForm()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            <span>Add Category</span>
-                        </button>
+                        <div class="header-controls">
+                            <button class="btn btn-secondary" onclick="window.exportCategoriesCSV()">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                <span>Export CSV</span>
+                            </button>
+                            <button class="btn btn-primary" onclick="window.openCategoryForm()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>Add Category</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="content-card">
@@ -801,24 +974,37 @@
                     </div>
                 </div>
 
-                <!-- ================= VIEW 5: CLIENTS ================= -->
+                <!-- ================= VIEW 5: CLIENTS & CUSTOMERS ================= -->
                 <div id="view-clients" class="view-panel">
                     <div class="page-header-container">
                         <div>
-                            <h1 class="page-title">Client Directory</h1>
-                            <p class="page-subtitle">Maintain retail customer contacts (isClient: true) and contact records.</p>
+                            <h1 class="page-title">Clients & Customers Directory</h1>
+                            <p class="page-subtitle">Manage wholesale clients (isClient: true) and retail customers (isClient: false).</p>
                         </div>
-                        <button class="btn btn-primary" onclick="openClientForm()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            <span>Add Client</span>
-                        </button>
+                        <div class="header-controls">
+                            <button class="btn btn-secondary" onclick="window.exportClientsCSV()">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                <span>Export CSV</span>
+                            </button>
+                            <button class="btn btn-primary" onclick="window.openClientForm()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>Add Contact</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="content-card">
                         <div class="toolbar-container">
                             <div class="search-box-wrapper">
                                 <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                                <input type="text" id="clientSearchInput" class="search-input" placeholder="Search client by name, phone, email...">
+                                <input type="text" id="clientSearchInput" class="search-input" placeholder="Search by name, phone, email...">
+                            </div>
+                            <div class="filter-group">
+                                <div style="display:flex; background:var(--bg-subtle); border-radius:var(--radius-md); padding:3px; gap:4px;">
+                                    <button class="btn btn-sm" id="btn-client-filter-all" style="background:#fff; box-shadow:var(--shadow-sm); color:var(--text-main);" onclick="window.filterClientsType('all')">All</button>
+                                    <button class="btn btn-sm" id="btn-client-filter-client" style="background:transparent; color:var(--text-muted);" onclick="window.filterClientsType('client')">Clients</button>
+                                    <button class="btn btn-sm" id="btn-client-filter-customer" style="background:transparent; color:var(--text-muted);" onclick="window.filterClientsType('customer')">Customers</button>
+                                </div>
                             </div>
                         </div>
 
@@ -826,7 +1012,7 @@
                             <table class="data-table" id="clientsTable">
                                 <thead>
                                     <tr>
-                                        <th>Client Name</th>
+                                        <th>Name & Classification</th>
                                         <th>Phone Number</th>
                                         <th>Email</th>
                                         <th>Address</th>
@@ -842,7 +1028,7 @@
                 <!-- VIEW 5B: CLIENT FORM -->
                 <div id="view-client-form" class="view-panel">
                     <div class="page-header-container">
-                        <h1 class="page-title" id="clientFormTitle">Add Client</h1>
+                        <h1 class="page-title" id="clientFormTitle">Add Client / Customer</h1>
                         <button class="btn btn-secondary" onclick="window.switchView('view-clients', 'Clients')">← Back to List</button>
                     </div>
                     <div class="content-card" style="max-width: 650px;">
@@ -850,12 +1036,19 @@
                             <form id="clientForm">
                                 <div class="form-grid">
                                     <div class="form-group col-span-2">
+                                        <label class="input-label">Classification Type *</label>
+                                        <select id="cl_type" class="input-control" style="font-weight:600;">
+                                            <option value="true">🏢 Client (Wholesale / Commercial)</option>
+                                            <option value="false">👤 Customer (Retail / Consumer)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-span-2">
                                         <label class="input-label">Full Name *</label>
-                                        <input type="text" id="cl_name" class="input-control" placeholder="e.g., Alex Johnson">
+                                        <input type="text" id="cl_name" class="input-control" placeholder="e.g., Alex Johnson" required>
                                     </div>
                                     <div class="form-group">
                                         <label class="input-label">Phone Number *</label>
-                                        <input type="text" id="cl_phone" class="input-control" placeholder="e.g., +1 555-0199">
+                                        <input type="text" id="cl_phone" class="input-control" placeholder="e.g., +1 555-0199" required>
                                     </div>
                                     <div class="form-group">
                                         <label class="input-label">Email Address</label>
@@ -868,7 +1061,7 @@
                                 </div>
                                 <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
                                     <button type="button" class="btn btn-secondary" onclick="window.switchView('view-clients', 'Clients')">Cancel</button>
-                                    <button type="button" class="btn btn-primary" id="saveClientBtn">Save Client</button>
+                                    <button type="button" class="btn btn-primary" id="saveClientBtn">Save Contact</button>
                                 </div>
                             </form>
                         </div>
@@ -882,10 +1075,16 @@
                             <h1 class="page-title">Business Profiles</h1>
                             <p class="page-subtitle">Commercial B2B partners, wholesale merchants, and enterprise billing entities.</p>
                         </div>
-                        <button class="btn btn-primary" onclick="openBusinessForm()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            <span>Add Business</span>
-                        </button>
+                        <div class="header-controls">
+                            <button class="btn btn-secondary" onclick="window.exportBusinessCSV()">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                <span>Export CSV</span>
+                            </button>
+                            <button class="btn btn-primary" onclick="window.openBusinessForm()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>Add Business</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="content-card">
@@ -957,10 +1156,11 @@
                             <p class="page-subtitle" id="wsHeaderDesc">Manage organizational roles, access privileges, and member invites.</p>
                         </div>
                         <div class="header-controls">
-                            <button class="btn btn-secondary" id="openCreateWsModalBtn">
-                                <span>+ New Workspace</span>
+                            <button class="btn btn-secondary" id="openEditWsModalBtn" style="display:none;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                <span>Edit Workspace</span>
                             </button>
-                            <button class="btn btn-primary" id="openInviteModalBtn">
+                            <button class="btn btn-primary" id="openInviteModalBtn" style="display:none;">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
                                 <span>+ Add Team Member</span>
                             </button>
@@ -997,7 +1197,33 @@
 
     <!-- ================= MODALS ================= -->
 
-    <!-- Add / Invite Team Member Modal -->
+    <!-- Edit Workspace Modal (Admin Only) -->
+    <div class="modal-overlay" id="editWorkspaceModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Workspace Details</h3>
+                <button class="modal-close-btn" id="closeEditWsModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editWorkspaceForm">
+                    <div class="form-group" style="margin-bottom:16px;">
+                        <label class="input-label">Workspace / Business Name *</label>
+                        <input type="text" id="ws_edit_name" class="input-control" placeholder="e.g., Apex Wholesale Mart" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="input-label">Description / Scope</label>
+                        <textarea id="ws_edit_desc" class="input-control" rows="3" placeholder="Retail store, inventory & billing"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelEditWsModalBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveEditWsBtn">Update Workspace</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add / Invite Team Member Modal (Admin Only) -->
     <div class="modal-overlay" id="addMemberModal">
         <div class="modal-dialog">
             <div class="modal-header">
@@ -1042,29 +1268,19 @@
         </div>
     </div>
 
-    <!-- Create Workspace Modal -->
+    <!-- Create Initial Workspace Modal (Only shown if user has no workspace) -->
     <div class="modal-overlay" id="createWorkspaceModal">
         <div class="modal-dialog">
             <div class="modal-header">
-                <h3 class="modal-title">Create New Workspace</h3>
-                <button class="modal-close-btn" id="closeWsModalBtn">&times;</button>
+                <h3 class="modal-title">Create Your Workspace</h3>
+                <button class="modal-close-btn" id="closeWsModalBtn" style="display:none;">&times;</button>
             </div>
             <div class="modal-body">
+                <p style="font-size:13.5px; color:var(--text-muted); margin-bottom:16px;">You are not connected to any workspace yet. Create your workspace to start managing your inventory and invoices.</p>
                 <form id="createWorkspaceForm">
                     <div class="form-group" style="margin-bottom:16px;">
                         <label class="input-label">Workspace / Business Name *</label>
-                        <input type="text" id="ws_new_name" class="input-control" placeholder="e.g., Apex Wholesale Mart" required>
-                    </div>
-                    <div class="form-group" style="margin-bottom:16px;">
-                        <label class="input-label">Currency Symbol</label>
-                        <select id="ws_new_currency" class="input-control">
-                            <option value="USD">USD ($)</option>
-                            <option value="EUR">EUR (€)</option>
-                            <option value="GBP">GBP (£)</option>
-                            <option value="BDT">BDT (৳)</option>
-                            <option value="INR">INR (₹)</option>
-                            <option value="CAD">CAD ($)</option>
-                        </select>
+                        <input type="text" id="ws_new_name" class="input-control" placeholder="e.g., Apex Mart" required>
                     </div>
                     <div class="form-group">
                         <label class="input-label">Description / Scope</label>
@@ -1073,8 +1289,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancelWsModalBtn">Cancel</button>
-                <button class="btn btn-primary" id="saveNewWsBtn">Create Workspace</button>
+                <button class="btn btn-primary" id="saveNewWsBtn" style="width:100%;">Create Workspace</button>
             </div>
         </div>
     </div>
@@ -1083,16 +1298,59 @@
     <div class="modal-overlay" id="invoicePreviewModal">
         <div class="modal-dialog modal-lg">
             <div class="modal-header">
-                <h3 class="modal-title">Invoice Preview</h3>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <h3 class="modal-title">Invoice Preview</h3>
+                    <div style="display:flex; background:var(--bg-subtle); border-radius:var(--radius-sm); padding:2px; gap:2px;">
+                        <button class="btn btn-sm" id="btnInvViewStandard" style="background:#fff; font-size:11.5px; padding:3px 8px; box-shadow:var(--shadow-sm);" onclick="window.switchInvoicePreviewLayout('standard')">📄 Standard A4</button>
+                        <button class="btn btn-sm" id="btnInvViewPOS" style="background:transparent; font-size:11.5px; padding:3px 8px; color:var(--text-muted);" onclick="window.switchInvoicePreviewLayout('pos')">🧾 POS Slip (80mm)</button>
+                    </div>
+                </div>
                 <button class="modal-close-btn" id="closeInvoicePreviewModal">&times;</button>
             </div>
             <div class="modal-body" id="invoicePreviewContent"></div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="closeInvoiceModalBtn">Close</button>
-                <button class="btn btn-primary" id="printInvoiceBtn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                    <span>Print / Save PDF</span>
+            <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <button class="btn btn-outline" id="copyInvoiceTextBtn">
+                    <span>📋 Copy Summary</span>
                 </button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-secondary" id="closeInvoiceModalBtn">Close</button>
+                    <button class="btn btn-primary" id="printInvoiceBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        <span>Print Document</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Variation Quick Preview Modal -->
+    <div class="modal-overlay" id="variationPreviewModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title" id="varPreviewModalTitle">Product Variations</h3>
+                    <p style="font-size:12px; color:var(--text-muted); margin-top:2px;" id="varPreviewModalSub"></p>
+                </div>
+                <button class="modal-close-btn" id="closeVarPreviewModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Option / Spec</th>
+                                <th>SKU / Barcode</th>
+                                <th>Stock</th>
+                                <th>Cost</th>
+                                <th>Sale Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="varPreviewModalBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeVarPreviewModalBtn2">Close</button>
             </div>
         </div>
     </div>
@@ -1106,8 +1364,11 @@
     <script type="module">
         import { auth, signOut, onAuthStateChanged } from "./firebaseConfig.js";
         import { 
+            generateUniqueId,
+            checkUserWorkspaceStatus,
             getActiveWorkspaceUid, 
             createWorkspace,
+            updateWorkspace,
             ensureWorkspaceExists,
             uploadImageToSupabase, 
             listenToProducts, 
@@ -1152,7 +1413,11 @@
         // --- App State ---
         let currentUser = null;
         let activeWorkspaceId = null;
-        let isTestMode = false;
+
+        let userRole = 'Worker';
+        let isAdmin = false;
+        let isCoAdmin = false;
+        let isWorker = true;
 
         let productsData = [];
         let categoriesData = [];
@@ -1162,7 +1427,9 @@
         let workersData = [];
         let currentWorkspaceInfo = null;
 
+        let currentClientFilter = 'all';
         let currentInvoiceTypeFilter = 'client';
+
         let editingProductId = null;
         let editingCategoryId = null;
         let editingClientId = null;
@@ -1249,116 +1516,47 @@
             });
         }
 
-        // --- Mock Data Generator for Offline / Test Mode ---
-        function loadMockData() {
-            categoriesData = [
-                { uniqueId: 'cat_coffee', name: 'Coffee & Tea', color: '#E11D48' },
-                { uniqueId: 'cat_acc', name: 'Accessories', color: '#2563EB' },
-                { uniqueId: 'cat_dairy', name: 'Dairy & Milks', color: '#10B981' }
-            ];
-
-            productsData = [
-                { 
-                    uniqueId: 'prod_1', 
-                    name: 'Artisan Espresso Roast', 
-                    category: 'cat_coffee', 
-                    quantity: 38, 
-                    salePrice: 18.50, 
-                    price: 9.20, 
-                    mrp: 21.00, 
-                    sizeWeight: '500g', 
-                    upcCode: '89012345001', 
-                    labelColor: '#E11D48',
-                    variations: [
-                        { uniqueId: 'v1', name: '250g Pouch', quantity: 15, price: 5.00, salePrice: 10.00, upcCode: '89012345001-S' },
-                        { uniqueId: 'v2', name: '1kg Bulk Pack', quantity: 23, price: 17.00, salePrice: 34.00, upcCode: '89012345001-L' }
-                    ]
-                },
-                { uniqueId: 'prod_2', name: 'Organic Matcha Green Tea', category: 'cat_coffee', quantity: 4, salePrice: 24.00, price: 12.00, mrp: 28.00, sizeWeight: '100g', upcCode: '89012345002', labelColor: '#10B981', variations: [] },
-                { uniqueId: 'prod_3', name: 'Stainless Steel Travel Tumbler', category: 'cat_acc', quantity: 15, salePrice: 32.00, price: 14.50, mrp: 35.00, sizeWeight: '450ml', upcCode: '89012345003', labelColor: '#2563EB', variations: [] },
-                { uniqueId: 'prod_4', name: 'Single-Origin Oat Milk Barista Edition', category: 'cat_dairy', quantity: 3, salePrice: 4.80, price: 2.20, mrp: 5.50, sizeWeight: '1L', upcCode: '89012345004', labelColor: '#F59E0B', variations: [] }
-            ];
-
-            clientsData = [
-                { uniqueId: 'cl_1', name: 'Sophia Martinez', phone: '+1 555-0144', email: 'sophia@example.com', address: '124 Blossom Hill Road', isClient: true },
-                { uniqueId: 'cl_2', name: 'Marcus Vance', phone: '+1 555-0892', email: 'marcus.vance@techcorp.io', address: '88 Tech Plaza, Apt 4B', isClient: true }
-            ];
-
-            businessData = [
-                { uniqueId: 'bz_1', name: 'Downtown Bistro & Cafe', phone: '+1 800-555-4422', email: 'orders@downtownbistro.com', address: '500 Main Street' }
-            ];
-
-            invoicesData = [
-                { 
-                    uniqueId: 'inv_1', 
-                    invoiceNumber: 'INV-2026-001', 
-                    customerName: 'Sophia Martinez', 
-                    customerNumber: '+1 555-0144', 
-                    customerEmail: 'sophia@example.com',
-                    customerAddress: '124 Blossom Hill Road',
-                    status: 'Paid', 
-                    paymentMethod: 'Credit / Debit Card',
-                    timestamp: Date.now() - 86400000, 
-                    totalPrice: 61.00,
-                    totalProfit: 27.80,
-                    items: [
-                        { name: 'Artisan Espresso Roast (500g)', quantity: 2, unitPrice: 18.50, costPrice: 9.20, discount: 0, total: 37.00 },
-                        { name: 'Organic Matcha Green Tea', quantity: 1, unitPrice: 24.00, costPrice: 12.00, discount: 0, total: 24.00 }
-                    ],
-                    discountPercent: 0,
-                    taxPercent: 0,
-                    shippingFee: 0,
-                    isBusinessInvoice: false
-                }
-            ];
-
-            workersData = [
-                { uniqueId: 'wrk_1', email: 'sarah.team@company.com', name: 'Sarah Davis', appWorkerId: 'WRK-4081', role: 'Staff Associate', isRestricted: false }
-            ];
-
-            currentWorkspaceInfo = {
-                name: 'PriceLister Demo Workspace',
-                description: 'Full-featured enterprise inventory management',
-                adminEmail: 'testmode@dev.local'
-            };
-
-            refreshAllUI();
-        }
-
         // --- Initialization & Auth Flow ---
-        const urlParams = new URLSearchParams(window.location.search);
-        isTestMode = urlParams.get('testMode') === 'true';
-
-        if (isTestMode) {
-            currentUser = { uid: 'test_dev_uid', email: 'testmode@dev.local' };
-            userEmailDisplay.innerText = 'Test Mode (offline)';
-            userAvatar.innerText = 'T';
-            document.getElementById('userRoleDisplay').innerText = 'Dev Admin';
-            loadMockData();
-        } else {
-            loadingIndicator.style.display = 'block';
-            onAuthStateChanged(auth, async (user) => {
-                if (!user) {
-                    window.location.href = "index.html";
-                } else {
-                    currentUser = user;
-                    userEmailDisplay.innerText = user.email || 'User';
-                    userAvatar.innerText = (user.displayName || user.email || 'U')[0].toUpperCase();
-                    document.getElementById('userRoleDisplay').innerText = 'Connected';
-                    await initRealtimeWorkspace(user.uid, user.email, user.displayName);
-                }
-            });
-        }
+        loadingIndicator.style.display = 'block';
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "index.html";
+            } else {
+                currentUser = user;
+                userEmailDisplay.innerText = user.email || 'User';
+                userAvatar.innerText = (user.displayName || user.email || 'U')[0].toUpperCase();
+                await initRealtimeWorkspace(user.uid, user.email, user.displayName);
+            }
+        });
 
         logoutBtn.addEventListener('click', async () => {
-            if (!isTestMode) await signOut(auth);
+            await signOut(auth);
             window.location.href = "index.html";
         });
 
         async function initRealtimeWorkspace(uid, email = "", displayName = "") {
             try {
-                activeWorkspaceId = await getActiveWorkspaceUid(uid);
-                await ensureWorkspaceExists(activeWorkspaceId, email, displayName);
+                const wsStatus = await checkUserWorkspaceStatus(uid);
+
+                if (!wsStatus.isConnected) {
+                    loadingIndicator.style.display = 'none';
+                    // User is not connected to any workspace yet: prompt to create workspace
+                    document.getElementById('createWorkspaceModal').classList.add('active');
+                    document.getElementById('openEditWsModalBtn').style.display = 'none';
+                    document.getElementById('openInviteModalBtn').style.display = 'none';
+                    return;
+                }
+
+                activeWorkspaceId = wsStatus.workspaceUid;
+                isAdmin = Boolean(wsStatus.isOwner || wsStatus.role === 'Admin' || activeWorkspaceId === uid);
+                isCoAdmin = Boolean(wsStatus.role === 'Co-Admin');
+                isWorker = !isAdmin && !isCoAdmin;
+                userRole = isAdmin ? 'Admin' : (isCoAdmin ? 'Co-Admin' : 'Staff');
+
+                // Update UI Role display and header buttons
+                document.getElementById('userRoleDisplay').innerText = isAdmin ? 'Admin (Owner)' : (isCoAdmin ? 'Co-Admin' : 'Staff');
+                document.getElementById('openEditWsModalBtn').style.display = isAdmin ? 'inline-flex' : 'none';
+                document.getElementById('openInviteModalBtn').style.display = isAdmin ? 'inline-flex' : 'none';
 
                 // Real-time Firestore Listeners
                 listenToProducts(activeWorkspaceId, (products) => {
@@ -1405,6 +1603,18 @@
 
                 listenToWorkers(activeWorkspaceId, (workers) => {
                     workersData = workers || [];
+                    // Check if current user is listed as Co-Admin in workers collection
+                    if (currentUser && !isAdmin) {
+                        const myWorkerRecord = workersData.find(w => w.email && w.email.toLowerCase() === (currentUser.email || '').toLowerCase());
+                        if (myWorkerRecord) {
+                            if (myWorkerRecord.role === 'Co-Admin') {
+                                isCoAdmin = true;
+                                isWorker = false;
+                                userRole = 'Co-Admin';
+                                document.getElementById('userRoleDisplay').innerText = 'Co-Admin';
+                            }
+                        }
+                    }
                     renderWorkersList();
                 });
 
@@ -1426,64 +1636,294 @@
             updateOverviewKPIs();
         }
 
-        // ================= 1. OVERVIEW & KPI LOGIC =================
-        function updateOverviewKPIs() {
-            const totalVal = productsData.reduce((sum, p) => sum + ((p.quantity || 0) * (p.salePrice || 0)), 0);
-            document.getElementById('kpi-inventory-val').innerText = `$${totalVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        // ================= 1. OVERVIEW & MAXIMUM UX DASHBOARD LOGIC =================
+        let currentDashboardPeriod = 'all';
 
-            document.getElementById('kpi-product-count').innerText = productsData.length;
-            document.getElementById('kpi-categories-sub').innerText = `${categoriesData.length} categories`;
+        window.setDashboardPeriod = function(period, btnEl) {
+            currentDashboardPeriod = period;
+            document.querySelectorAll('.period-pill').forEach(p => p.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            updateOverviewKPIs();
+            showToast(`Dashboard filtered: ${period === 'all' ? 'All Time' : (period === 'month' ? 'This Month' : (period === 'week' ? 'This Week' : 'Today'))}`, 'info');
+        };
+
+        function updateOverviewKPIs() {
+            // Workspace Greeting & Live Clock
+            const wsName = currentWorkspaceInfo ? (currentWorkspaceInfo.name || 'Price Lister') : 'Price Lister';
+            const wsTitleEl = document.getElementById('dashWsTitle');
+            if (wsTitleEl) wsTitleEl.innerText = wsName;
+
+            const hour = new Date().getHours();
+            const greeting = hour < 12 ? '🌅 Good morning,' : (hour < 18 ? '☀️ Good afternoon,' : '🌙 Good evening,');
+            const greetingEl = document.getElementById('dashGreeting');
+            if (greetingEl) greetingEl.innerText = greeting;
+
+            // Quick Command Counts
+            const cmdProd = document.getElementById('cmd-prod-count');
+            if (cmdProd) cmdProd.innerText = productsData.length;
+            const cmdInv = document.getElementById('cmd-inv-count');
+            if (cmdInv) cmdInv.innerText = invoicesData.length;
+            const cmdCat = document.getElementById('cmd-cat-count');
+            if (cmdCat) cmdCat.innerText = categoriesData.length;
+            const cmdClient = document.getElementById('cmd-client-count');
+            if (cmdClient) cmdClient.innerText = clientsData.length;
+            const cmdBiz = document.getElementById('cmd-biz-count');
+            if (cmdBiz) cmdBiz.innerText = businessData.length;
+
+            // 1. Retail Valuation & Total Units
+            let totalUnits = 0;
+            let totalCostInvestment = 0;
+            let totalRetailValuation = 0;
+
+            productsData.forEach(p => {
+                const qty = p.quantity || 0;
+                totalUnits += qty;
+                totalRetailValuation += (qty * (p.salePrice || 0));
+                totalCostInvestment += (qty * (p.price || 0));
+            });
+
+            document.getElementById('kpi-inventory-val').innerText = `$${totalRetailValuation.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            const invUnitsEl = document.getElementById('kpi-inventory-units');
+            if (invUnitsEl) invUnitsEl.innerText = `${totalUnits.toLocaleString()} units across ${productsData.length} items`;
+
+            // 2. Cost Capital Invested
+            const costValEl = document.getElementById('kpi-cost-val');
+            if (costValEl) costValEl.innerText = `$${totalCostInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            // 3. Potential Stock Profit & Margin
+            const profitVal = Math.max(0, totalRetailValuation - totalCostInvestment);
+            const marginPct = totalRetailValuation > 0 ? (((profitVal) / totalRetailValuation) * 100).toFixed(0) : 0;
+            const profitValEl = document.getElementById('kpi-profit-val');
+            if (profitValEl) profitValEl.innerText = `+$${profitVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            const marginPctEl = document.getElementById('kpi-margin-pct');
+            if (marginPctEl) marginPctEl.innerText = `+${marginPct}% Gross Stock Margin`;
+
+            // Filter Invoices by Period
+            const now = Date.now();
+            const oneDayMs = 24 * 60 * 60 * 1000;
+            const periodInvoices = invoicesData.filter(inv => {
+                if (currentDashboardPeriod === 'all') return true;
+                const invTime = inv.timestamp || (inv.date ? new Date(inv.date).getTime() : now);
+                if (currentDashboardPeriod === 'today') return (now - invTime) <= oneDayMs;
+                if (currentDashboardPeriod === 'week') return (now - invTime) <= (7 * oneDayMs);
+                if (currentDashboardPeriod === 'month') return (now - invTime) <= (30 * oneDayMs);
+                return true;
+            });
+
+            // 4. Invoiced Revenue
+            const invoicedVal = periodInvoices.reduce((sum, inv) => sum + (inv.totalPrice || 0), 0);
+            document.getElementById('kpi-invoices-val').innerText = `$${invoicedVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('kpi-invoices-sub').innerText = `${periodInvoices.length} invoices (${currentDashboardPeriod.toUpperCase()})`;
+            document.getElementById('badge-invoices-count').innerText = invoicesData.length;
             document.getElementById('badge-products-count').innerText = productsData.length;
 
-            const invoicedVal = invoicesData.reduce((sum, inv) => sum + (inv.totalPrice || 0), 0);
-            document.getElementById('kpi-invoices-val').innerText = `$${invoicedVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('kpi-invoices-sub').innerText = `${invoicesData.length} recorded`;
-            document.getElementById('badge-invoices-count').innerText = invoicesData.length;
+            // 5. Unpaid / Due Receivables
+            const unpaidInvoices = invoicesData.filter(inv => inv.status === 'Unpaid' || inv.status === 'Pending' || inv.status === 'Overdue');
+            const unpaidVal = unpaidInvoices.reduce((sum, inv) => sum + (inv.totalPrice || 0), 0);
+            const unpaidValEl = document.getElementById('kpi-unpaid-val');
+            if (unpaidValEl) unpaidValEl.innerText = `$${unpaidVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            const unpaidCountEl = document.getElementById('kpi-unpaid-count');
+            if (unpaidCountEl) unpaidCountEl.innerText = `${unpaidInvoices.length} unpaid / pending receipts`;
 
-            const activeClientsCount = clientsData.filter(c => c.isClient !== false).length;
-            document.getElementById('kpi-clients-count').innerText = activeClientsCount + businessData.length;
+            // 6. Network Directory
+            document.getElementById('kpi-clients-count').innerText = (clientsData.length + businessData.length);
+            const netSubEl = document.getElementById('kpi-network-sub');
+            if (netSubEl) netSubEl.innerText = `${clientsData.length} contacts · ${businessData.length} B2B companies`;
 
-            // Low Stock
+            // 7. Inventory Stock Health Meter
+            const countGood = productsData.filter(p => (p.quantity || 0) > 5).length;
+            const countLow = productsData.filter(p => (p.quantity || 0) > 0 && (p.quantity || 0) <= 5).length;
+            const countOut = productsData.filter(p => (p.quantity || 0) <= 0).length;
+            const totalCount = productsData.length || 1;
+
+            let totalVariations = 0;
+            productsData.forEach(p => {
+                if (p.variations && Array.isArray(p.variations)) totalVariations += p.variations.length;
+            });
+
+            const pctGood = Math.round((countGood / totalCount) * 100);
+            const pctLow = Math.round((countLow / totalCount) * 100);
+            const pctOut = Math.round((countOut / totalCount) * 100);
+
+            const segGood = document.getElementById('segGood');
+            if (segGood) segGood.style.width = `${pctGood}%`;
+            const segLow = document.getElementById('segLow');
+            if (segLow) segLow.style.width = `${pctLow}%`;
+            const segOut = document.getElementById('segOut');
+            if (segOut) segOut.style.width = `${pctOut}%`;
+
+            const cGoodEl = document.getElementById('countGoodStock');
+            if (cGoodEl) cGoodEl.innerText = `${countGood} (${pctGood}%)`;
+            const cLowEl = document.getElementById('countLowStock');
+            if (cLowEl) cLowEl.innerText = `${countLow} (${pctLow}%)`;
+            const cOutEl = document.getElementById('countOutStock');
+            if (cOutEl) cOutEl.innerText = `${countOut} (${pctOut}%)`;
+            const cVarEl = document.getElementById('countVarTotal');
+            if (cVarEl) cVarEl.innerText = `${totalVariations} total`;
+            const hTotEl = document.getElementById('healthTotalProds');
+            if (hTotEl) hTotEl.innerText = productsData.length;
+
+            // 8. 7-Day Interactive Revenue & Sales Flow Chart
+            renderRevenueFlowChart();
+
+            // 9. Low Stock Warnings with 1-Click Restock
             const lowStockBody = document.getElementById('lowStockBody');
             lowStockBody.innerHTML = '';
-            const lowItems = productsData.filter(p => (p.quantity || 0) <= 5);
+            const lowItems = productsData.filter(p => (p.quantity || 0) <= 5).sort((a,b) => (a.quantity || 0) - (b.quantity || 0));
 
             if (lowItems.length === 0) {
-                lowStockBody.innerHTML = `<tr><td colspan="4" class="empty-state">No low stock items. Everything is well stocked!</td></tr>`;
+                lowStockBody.innerHTML = `<tr><td colspan="4" class="empty-state">No low stock items. All inventory is well stocked!</td></tr>`;
             } else {
                 lowItems.slice(0, 5).forEach(p => {
                     const catName = getCategoryName(p.category);
                     const catColor = getCategoryColor(p.category);
+                    const qty = p.quantity || 0;
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td><strong>${p.name}</strong></td>
-                        <td><span class="badge" style="background:${catColor}; color:#fff">${catName}</span></td>
-                        <td><span class="badge badge-danger">${p.quantity || 0} left</span></td>
-                        <td class="text-right" style="font-weight:700;">$${(p.salePrice || 0).toFixed(2)}</td>
+                        <td>
+                            <strong>${p.name}</strong>
+                            <br><span class="badge" style="background:${catColor}; color:#fff; font-size:10.5px; padding:1px 6px;">${catName}</span>
+                        </td>
+                        <td><span class="badge ${qty === 0 ? 'badge-danger' : 'badge-warning'}">${qty} left</span></td>
+                        <td style="font-weight:700;">$${(p.salePrice || 0).toFixed(2)}</td>
+                        <td class="text-right">
+                            <button type="button" class="btn btn-primary btn-sm" style="font-size:11px; padding:3px 8px;" onclick="window.quickAdjustStock('${p.uniqueId}', 10)" title="Add 10 units to stock">+10 Stock</button>
+                        </td>
                     `;
                     lowStockBody.appendChild(tr);
                 });
             }
 
-            // Recent Invoices
+            // 10. Recent Invoices Feed
             const recentBody = document.getElementById('recentInvoicesBody');
             recentBody.innerHTML = '';
             if (invoicesData.length === 0) {
                 recentBody.innerHTML = `<tr><td colspan="4" class="empty-state">No invoices recorded yet.</td></tr>`;
             } else {
-                const sorted = [...invoicesData].sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).slice(0, 5);
-                sorted.forEach(inv => {
+                const sortedInvoices = [...invoicesData].sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).slice(0, 5);
+                sortedInvoices.forEach(inv => {
                     const tr = document.createElement('tr');
-                    const badgeClass = inv.status === 'Paid' ? 'badge-success' : (inv.status === 'Unpaid' ? 'badge-danger' : 'badge-neutral');
+                    const badgeClass = inv.status === 'Paid' ? 'badge-success' : (inv.status === 'Unpaid' || inv.status === 'Pending' ? 'badge-warning' : 'badge-neutral');
                     tr.innerHTML = `
-                        <td><strong>${inv.invoiceNumber || '-'}</strong></td>
+                        <td>
+                            <strong>${inv.invoiceNumber || '-'}</strong>
+                            <br><small style="color:var(--text-muted); font-size:10.5px;">${inv.date || 'Today'}</small>
+                        </td>
                         <td>${inv.customerName || 'Customer'}</td>
-                        <td><span class="badge ${badgeClass}">${inv.status || 'Draft'}</span></td>
-                        <td class="text-right" style="font-weight:700; color:var(--primary);">$${(inv.totalPrice || 0).toFixed(2)}</td>
+                        <td style="font-weight:700; color:var(--primary);">$${(inv.totalPrice || 0).toFixed(2)}</td>
+                        <td>
+                            <span class="badge ${badgeClass}" style="cursor:pointer;" onclick="window.openInvoicePreviewModal(invoicesData.find(i=>i.uniqueId==='${inv.uniqueId}'))" title="Click to preview">${inv.status || 'Draft'}</span>
+                        </td>
                     `;
                     recentBody.appendChild(tr);
                 });
             }
+
+            // 11. Top High-Value Inventory Ranking
+            const topInventoryBody = document.getElementById('topInventoryBody');
+            if (topInventoryBody) {
+                topInventoryBody.innerHTML = '';
+                const sortedByValue = [...productsData].sort((a, b) => ((b.quantity || 0) * (b.salePrice || 0)) - ((a.quantity || 0) * (a.salePrice || 0))).slice(0, 5);
+
+                if (sortedByValue.length === 0) {
+                    topInventoryBody.innerHTML = `<tr><td colspan="4" class="empty-state">No products in catalog.</td></tr>`;
+                } else {
+                    sortedByValue.forEach((p, index) => {
+                        const val = (p.quantity || 0) * (p.salePrice || 0);
+                        const cost = (p.quantity || 0) * (p.price || 0);
+                        const margin = val > 0 ? (((val - cost) / val) * 100).toFixed(0) : 0;
+                        const rankClass = index === 0 ? 'top-1' : (index === 1 ? 'top-2' : (index === 2 ? 'top-3' : ''));
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="ranking-pos-badge ${rankClass}">#${index + 1}</span>
+                                    <div>
+                                        <strong>${p.name}</strong>
+                                        <br><small style="color:var(--text-muted); font-size:10.5px;">${getCategoryName(p.category)}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-neutral">${p.quantity || 0} units</span></td>
+                            <td><span class="badge ${margin >= 40 ? 'badge-success' : 'badge-neutral'}">+${margin}%</span></td>
+                            <td class="text-right" style="font-weight:800; color:var(--primary);">$${val.toFixed(2)}</td>
+                        `;
+                        topInventoryBody.appendChild(tr);
+                    });
+                }
+            }
+        }
+
+        // 7-Day Revenue & Sales Flow Visualizer
+        function renderRevenueFlowChart() {
+            const chartContainer = document.getElementById('revenueChartContainer');
+            if (!chartContainer) return;
+
+            const days = [];
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const today = new Date();
+            let maxDailyRev = 100;
+            let total7Days = 0;
+
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(today.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                const dayLabel = `${dayNames[d.getDay()]} ${d.getDate()}`;
+
+                const dayInvoices = invoicesData.filter(inv => {
+                    const invDate = inv.date || (inv.timestamp ? new Date(inv.timestamp).toISOString().split('T')[0] : '');
+                    return invDate === dateStr;
+                });
+
+                const dailyTotal = dayInvoices.reduce((sum, inv) => sum + (inv.totalPrice || 0), 0);
+                if (dailyTotal > maxDailyRev) maxDailyRev = dailyTotal;
+                total7Days += dailyTotal;
+
+                days.push({
+                    dateStr,
+                    dayLabel,
+                    total: dailyTotal,
+                    count: dayInvoices.length
+                });
+            }
+
+            const chartTotalEl = document.getElementById('chartTotal7Days');
+            if (chartTotalEl) chartTotalEl.innerText = `$${total7Days.toFixed(2)} this week`;
+
+            let chartHtml = '';
+            days.forEach(day => {
+                const heightPercent = Math.max(12, Math.round((day.total / maxDailyRev) * 100));
+                const isHighlight = day.total > 0;
+                chartHtml += `
+                    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end;">
+                        <span style="font-size:11px; font-weight:700; color:${isHighlight ? 'var(--primary)' : 'var(--text-subtle)'}; margin-bottom:4px;">$${Math.round(day.total)}</span>
+                        <div style="width:100%; max-width:38px; height:${heightPercent}%; background:${isHighlight ? 'linear-gradient(180deg, #E11D48 0%, #FB7185 100%)' : 'var(--bg-subtle)'}; border-radius:6px 6px 0 0; transition:height 0.4s ease; position:relative;" title="${day.dayLabel}: $${day.total.toFixed(2)} (${day.count} invoices)"></div>
+                        <span style="font-size:11px; font-weight:600; color:var(--text-muted); margin-top:6px; white-space:nowrap;">${day.dayLabel}</span>
+                    </div>
+                `;
+            });
+
+            chartContainer.innerHTML = chartHtml;
+        }
+
+        // --- Dark / Light Theme System ---
+        const savedTheme = localStorage.getItem('plister_theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeToggleIcon = document.getElementById('themeToggleIcon');
+        if (themeToggleIcon) themeToggleIcon.innerText = savedTheme === 'dark' ? '☀️' : '🌙';
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                const currentTheme = document.body.getAttribute('data-theme') || 'light';
+                const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.body.setAttribute('data-theme', nextTheme);
+                localStorage.setItem('plister_theme', nextTheme);
+                if (themeToggleIcon) themeToggleIcon.innerText = nextTheme === 'dark' ? '☀️' : '🌙';
+                showToast(`Switched to ${nextTheme} mode`, 'info');
+            });
         }
 
         // ================= 2. PRODUCTS & VARIATIONS LOGIC =================
@@ -1493,6 +1933,7 @@
 
             const searchTerm = (document.getElementById('productSearchInput').value || '').toLowerCase();
             const categoryFilter = document.getElementById('productCategoryFilter').value;
+            const stockFilter = document.getElementById('productStockFilter') ? document.getElementById('productStockFilter').value : 'all';
 
             const filtered = productsData.filter(p => {
                 const catName = getCategoryName(p.category).toLowerCase();
@@ -1501,7 +1942,15 @@
                                       catName.includes(searchTerm);
                 
                 const matchesCat = !categoryFilter || p.category === categoryFilter || getCategoryName(p.category) === categoryFilter;
-                return matchesSearch && matchesCat;
+
+                const qty = p.quantity || 0;
+                let matchesStock = true;
+                if (stockFilter === 'in_stock') matchesStock = qty > 5;
+                else if (stockFilter === 'low_stock') matchesStock = qty > 0 && qty <= 5;
+                else if (stockFilter === 'out_of_stock') matchesStock = qty <= 0;
+                else if (stockFilter === 'has_variations') matchesStock = p.variations && p.variations.length > 0;
+
+                return matchesSearch && matchesCat && matchesStock;
             });
 
             if (filtered.length === 0) {
@@ -1536,13 +1985,13 @@
                 const catColor = getCategoryColor(product.category);
 
                 const variationsCount = (product.variations && product.variations.length > 0) 
-                    ? `<br><span class="badge badge-neutral" style="font-size:10.5px; margin-top:4px;">✨ ${product.variations.length} variations</span>` 
+                    ? `<br><button type="button" class="btn-var-preview" style="margin-top:4px;" onclick="window.openVariationPreviewModal('${product.uniqueId}')">🎨 ${product.variations.length} Options</button>` 
                     : '';
 
                 tr.innerHTML = `
                     <td>
                         <div style="display:flex; align-items:center; gap:12px;">
-                            ${product.imageUri ? `<img src="${product.imageUri}" style="width:36px;height:36px;border-radius:var(--radius-sm);object-fit:cover;border:1px solid var(--border-color);">` : ''}
+                            ${product.imageUri ? `<img src="${product.imageUri}" style="width:38px;height:38px;border-radius:var(--radius-sm);object-fit:cover;border:1px solid var(--border-color);">` : ''}
                             <div>
                                 <strong>${product.name || 'Unnamed'}</strong>
                                 ${product.sizeWeight ? `<small style="color:var(--text-muted)"> (${product.sizeWeight})</small>` : ''}
@@ -1557,28 +2006,31 @@
                             ${catName}
                         </span>
                     </td>
-                    <td>${qtyBadge}</td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            ${qtyBadge}
+                            <button type="button" class="btn btn-outline btn-sm" style="padding:1px 5px; font-size:10px;" onclick="window.quickAdjustStock('${product.uniqueId}', 1)" title="Add 1 to stock">+</button>
+                            <button type="button" class="btn btn-outline btn-sm" style="padding:1px 5px; font-size:10px;" onclick="window.quickAdjustStock('${product.uniqueId}', -1)" title="Minus 1 from stock">-</button>
+                        </div>
+                    </td>
                     <td>$${cost.toFixed(2)}</td>
                     <td style="color:var(--primary); font-weight:700;">$${sale.toFixed(2)}</td>
                     <td>${marginBadge}</td>
                     <td class="text-right">
-                        <button class="btn btn-outline btn-sm edit-btn" style="margin-right:6px;" data-id="${product.uniqueId}">Edit</button>
-                        <button class="btn btn-danger btn-sm del-btn" data-id="${product.uniqueId}">Delete</button>
+                        <div style="display:inline-flex; gap:4px;">
+                            <button class="btn btn-outline btn-sm edit-btn" data-id="${product.uniqueId}" title="Edit Product">Edit</button>
+                            <button class="btn btn-outline btn-sm copy-btn" onclick="window.duplicateProduct('${product.uniqueId}')" title="Duplicate Product">Copy</button>
+                            <button class="btn btn-danger btn-sm del-btn" data-id="${product.uniqueId}" title="Delete Product">&times;</button>
+                        </div>
                     </td>
                 `;
                 body.appendChild(tr);
 
-                tr.querySelector('.edit-btn').addEventListener('click', () => openProductForm(product));
+                tr.querySelector('.edit-btn').addEventListener('click', () => window.openProductForm(product));
                 tr.querySelector('.del-btn').addEventListener('click', async () => {
                     if (confirm(`Are you sure you want to delete "${product.name}"?`)) {
-                        if (isTestMode) {
-                            productsData = productsData.filter(p => p.uniqueId !== product.uniqueId);
-                            refreshAllUI();
-                            showToast("Product deleted (Demo Mode)");
-                        } else {
-                            await deleteProduct(activeWorkspaceId, product.uniqueId);
-                            showToast("Product deleted successfully");
-                        }
+                        await deleteProduct(activeWorkspaceId, product.uniqueId);
+                        showToast("Product deleted successfully");
                     }
                 });
             });
@@ -1586,47 +2038,160 @@
 
         document.getElementById('productSearchInput').addEventListener('input', renderProductsList);
         document.getElementById('productCategoryFilter').addEventListener('change', renderProductsList);
+        const prodStockFilterEl = document.getElementById('productStockFilter');
+        if (prodStockFilterEl) prodStockFilterEl.addEventListener('change', renderProductsList);
 
         // Variations Manager Logic in Product Form
-        function addVariationRow(name = '', sku = '', qty = 0, cost = 0, sale = 0) {
+        function updateVariationSummaryCount() {
+            const rows = document.querySelectorAll('#variationsTableBody tr');
+            let totalVarQty = 0;
+            rows.forEach(r => {
+                const q = parseFloat(r.querySelector('.var-qty-input').value) || 0;
+                totalVarQty += q;
+            });
+            const summaryEl = document.getElementById('varCountSummary');
+            if (summaryEl) {
+                summaryEl.innerText = `${rows.length} Options (${totalVarQty} Units)`;
+            }
+        }
+
+        function addVariationRow(name = '', sku = '', qty = 0, cost = 0, sale = 0, mrp = 0) {
             const tbody = document.getElementById('variationsTableBody');
             const tr = document.createElement('tr');
 
             tr.innerHTML = `
                 <td>
-                    <input type="text" class="input-control var-name-input" placeholder="e.g., 250g Pouch / Blue M" value="${name}" style="padding:6px 10px;">
+                    <input type="text" class="input-control var-name-input" placeholder="e.g. Medium (M), 500g" value="${name}" required>
                 </td>
                 <td>
-                    <input type="text" class="input-control var-sku-input" placeholder="SKU-001" value="${sku}" style="padding:6px 10px; font-family:var(--font-mono);">
+                    <input type="text" class="input-control var-sku-input" placeholder="UPC / SKU" value="${sku}">
                 </td>
                 <td>
-                    <input type="number" class="input-control var-qty-input" placeholder="0" value="${qty}" min="0" step="1" style="padding:6px 10px;">
+                    <input type="number" class="input-control var-qty-input" min="0" value="${qty}">
                 </td>
                 <td>
-                    <input type="number" class="input-control var-cost-input" placeholder="0.00" value="${cost}" min="0" step="0.01" style="padding:6px 10px;">
+                    <input type="number" class="input-control var-cost-input" min="0" step="0.01" value="${cost}">
                 </td>
                 <td>
-                    <input type="number" class="input-control var-sale-input" placeholder="0.00" value="${sale}" min="0" step="0.01" style="padding:6px 10px;">
+                    <input type="number" class="input-control var-sale-input" min="0" step="0.01" value="${sale}">
+                </td>
+                <td>
+                    <input type="number" class="input-control var-mrp-input" min="0" step="0.01" value="${mrp}">
                 </td>
                 <td class="text-right">
-                    <button type="button" class="btn btn-danger btn-sm remove-var-btn" style="padding:4px 8px;">&times;</button>
+                    <button type="button" class="btn btn-danger btn-sm del-var-row-btn">&times;</button>
                 </td>
             `;
 
             tbody.appendChild(tr);
-            tr.querySelector('.remove-var-btn').addEventListener('click', () => tr.remove());
+
+            tr.querySelector('.del-var-row-btn').addEventListener('click', () => {
+                tr.remove();
+                updateVariationSummaryCount();
+            });
+
+            tr.querySelector('.var-qty-input').addEventListener('input', updateVariationSummaryCount);
+            updateVariationSummaryCount();
         }
+
+        window.applyVariationPreset = function(type) {
+            const baseCost = parseFloat(document.getElementById('p_cost').value) || 0;
+            const baseSale = parseFloat(document.getElementById('p_price').value) || 0;
+            const baseMrp = parseFloat(document.getElementById('p_mrp').value) || 0;
+            const baseSku = document.getElementById('p_upc').value.trim() || 'SKU';
+
+            let options = [];
+            if (type === 'sizes') options = ['Small (S)', 'Medium (M)', 'Large (L)', 'Extra Large (XL)'];
+            else if (type === 'weights') options = ['250g Pouch', '500g Pack', '1kg Bag'];
+            else if (type === 'colors') options = ['Black', 'White', 'Navy Blue', 'Crimson Red'];
+            else if (type === 'packs') options = ['Single (1-Pack)', 'Value 3-Pack', 'Bulk 6-Pack'];
+
+            options.forEach((opt, idx) => {
+                addVariationRow(opt, `${baseSku}-${idx + 1}`, 10, baseCost, baseSale, baseMrp);
+            });
+            showToast(`Added ${options.length} variation options from preset!`);
+        };
 
         document.getElementById('addVariationRowBtn').addEventListener('click', () => {
             const baseCost = parseFloat(document.getElementById('p_cost').value) || 0;
             const baseSale = parseFloat(document.getElementById('p_price').value) || 0;
-            addVariationRow('', '', 0, baseCost, baseSale);
+            const baseMrp = parseFloat(document.getElementById('p_mrp').value) || 0;
+            addVariationRow('', '', 0, baseCost, baseSale, baseMrp);
         });
+
+        // Quick Preview Variations Modal
+        window.openVariationPreviewModal = function(productId) {
+            const product = productsData.find(p => p.uniqueId === productId);
+            if (!product) return;
+
+            document.getElementById('varPreviewModalTitle').innerText = `${product.name} — Variations`;
+            document.getElementById('varPreviewModalSub').innerText = `Base Price: $${(product.salePrice || 0).toFixed(2)} · Category: ${getCategoryName(product.category)}`;
+
+            const tbody = document.getElementById('varPreviewModalBody');
+            tbody.innerHTML = '';
+
+            if (!product.variations || product.variations.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No variations configured for this product.</td></tr>`;
+            } else {
+                product.variations.forEach(v => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${v.name || v.variationName || 'Option'}</strong></td>
+                        <td><span style="font-family:var(--font-mono); font-size:12px;">${v.upcCode || v.sku || '-'}</span></td>
+                        <td><span class="badge ${v.quantity <= 0 ? 'badge-danger' : (v.quantity <= 5 ? 'badge-warning' : 'badge-success')}">${v.quantity || 0} in stock</span></td>
+                        <td>$${(v.price || 0).toFixed(2)}</td>
+                        <td style="font-weight:700; color:var(--primary);">$${(v.salePrice || 0).toFixed(2)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('variationPreviewModal').classList.add('active');
+        };
+
+        const closeVarModalBtn = document.getElementById('closeVarPreviewModalBtn');
+        if (closeVarModalBtn) closeVarModalBtn.addEventListener('click', () => document.getElementById('variationPreviewModal').classList.remove('active'));
+        const closeVarModalBtn2 = document.getElementById('closeVarPreviewModalBtn2');
+        if (closeVarModalBtn2) closeVarModalBtn2.addEventListener('click', () => document.getElementById('variationPreviewModal').classList.remove('active'));
+
+        // Quick Stock Adjuster
+        window.quickAdjustStock = async function(productId, delta) {
+            const product = productsData.find(p => p.uniqueId === productId);
+            if (!product) return;
+
+            const newQty = Math.max(0, (product.quantity || 0) + delta);
+            product.quantity = newQty;
+
+            await saveProduct(activeWorkspaceId, product, false);
+            showToast(`Stock updated: ${product.name} (${newQty})`);
+        };
+
+        // Duplicate Product
+        window.duplicateProduct = async function(productId) {
+            const source = productsData.find(p => p.uniqueId === productId);
+            if (!source) return;
+
+            const clone = JSON.parse(JSON.stringify(source));
+            clone.uniqueId = generateUniqueId('prod');
+            clone.name = `${source.name} (Copy)`;
+            clone.timestamp = Date.now();
+            clone.updatedTimestamp = Date.now();
+
+            if (clone.variations && Array.isArray(clone.variations)) {
+                clone.variations.forEach(v => {
+                    v.uniqueId = generateUniqueId('var');
+                });
+            }
+
+            await saveProduct(activeWorkspaceId, clone, true);
+            showToast(`Duplicated "${source.name}"`);
+        };
 
         // Product Form Helpers
         window.openProductForm = function (product = null) {
             document.getElementById('productForm').reset();
             document.getElementById('variationsTableBody').innerHTML = '';
+            updateVariationSummaryCount();
             populateCategoryDropdowns();
             const previewBox = document.getElementById('productImagePreviewBox');
             previewBox.innerHTML = '<span style="color:var(--text-subtle);font-size:11px;">No Image</span>';
@@ -1656,7 +2221,7 @@
                 // Populate variations
                 if (product.variations && Array.isArray(product.variations)) {
                     product.variations.forEach(v => {
-                        addVariationRow(v.name || '', v.upcCode || v.sku || '', v.quantity || 0, v.price || 0, v.salePrice || 0);
+                        addVariationRow(v.name || v.variationName || '', v.upcCode || v.sku || '', v.quantity || 0, v.price || 0, v.salePrice || 0, v.mrp || 0);
                     });
                 }
             } else {
@@ -1686,16 +2251,6 @@
             const uploadStatus = document.getElementById('uploadStatusText');
             uploadStatus.innerText = 'Uploading...';
 
-            if (isTestMode) {
-                setTimeout(() => {
-                    const fakeUrl = URL.createObjectURL(file);
-                    document.getElementById('p_image').value = fakeUrl;
-                    document.getElementById('productImagePreviewBox').innerHTML = `<img src="${fakeUrl}" style="width:100%;height:100%;object-fit:cover;">`;
-                    uploadStatus.innerText = 'Uploaded (Local Preview)';
-                }, 500);
-                return;
-            }
-
             const publicUrl = await uploadImageToSupabase(file);
             if (publicUrl) {
                 document.getElementById('p_image').value = publicUrl;
@@ -1718,16 +2273,21 @@
         // Save Product Handler
         document.getElementById('saveProductBtn').addEventListener('click', async () => {
             const name = document.getElementById('p_name').value.trim();
-            const category = document.getElementById('p_category').value;
+            let category = document.getElementById('p_category').value;
+            if (!category && categoriesData.length > 0) {
+                category = categoriesData[0].uniqueId;
+            } else if (!category) {
+                category = 'cat_general';
+            }
             const qty = parseFloat(document.getElementById('p_qty').value);
             const price = parseFloat(document.getElementById('p_price').value);
 
-            if (!name || !category || isNaN(qty) || isNaN(price)) {
-                showToast("Please enter Product Name, Category, Stock Qty, and Sale Price (*)", "error");
+            if (!name || isNaN(qty) || isNaN(price)) {
+                showToast("Please enter Product Name, Stock Quantity, and Sale Price (*)", "error");
                 return;
             }
 
-            // Extract variations
+            // Extract variations (Matching Android models perfectly)
             const variations = [];
             document.querySelectorAll('#variationsTableBody tr').forEach(row => {
                 const varName = row.querySelector('.var-name-input').value.trim();
@@ -1735,22 +2295,25 @@
                 const varQty = parseFloat(row.querySelector('.var-qty-input').value) || 0;
                 const varCost = parseFloat(row.querySelector('.var-cost-input').value) || 0;
                 const varSale = parseFloat(row.querySelector('.var-sale-input').value) || 0;
+                const varMrp = parseFloat(row.querySelector('.var-mrp-input') ? row.querySelector('.var-mrp-input').value : 0) || 0;
 
                 if (varName) {
                     variations.push({
-                        uniqueId: `var_${Date.now()}_${Math.random().toString(36).substring(2,6)}`,
+                        uniqueId: generateUniqueId('var'),
                         name: varName,
+                        variationName: varName,
                         upcCode: sku,
                         sku: sku,
                         quantity: varQty,
                         price: varCost,
-                        salePrice: varSale
+                        salePrice: varSale,
+                        mrp: varMrp
                     });
                 }
             });
 
             const isNew = !editingProductId;
-            const uniqueId = isNew ? `prod_${Date.now()}` : editingProductId;
+            const uniqueId = isNew ? generateUniqueId('prod') : editingProductId;
             const existingProduct = editingProductId ? (productsData.find(p => p.uniqueId === editingProductId) || {}) : {};
 
             const productData = {
@@ -1770,7 +2333,7 @@
                 imageUri: document.getElementById('p_image').value.trim() || null,
                 note: document.getElementById('p_note').value.trim(),
                 variations: variations,
-                creatorId: currentUser ? currentUser.uid : (existingProduct.creatorId || 'demo'),
+                creatorId: currentUser ? currentUser.uid : (existingProduct.creatorId || 'admin'),
                 timestamp: isNew ? Date.now() : (existingProduct.timestamp || Date.now()),
                 updatedTimestamp: Date.now()
             };
@@ -1780,16 +2343,7 @@
             btn.disabled = true;
 
             try {
-                if (isTestMode) {
-                    if (isNew) productsData.push(productData);
-                    else {
-                        const idx = productsData.findIndex(p => p.uniqueId === uniqueId);
-                        if (idx >= 0) productsData[idx] = productData;
-                    }
-                    refreshAllUI();
-                } else {
-                    await saveProduct(activeWorkspaceId, productData, isNew);
-                }
+                await saveProduct(activeWorkspaceId, productData, isNew);
                 showToast(isNew ? "Product created successfully!" : "Product updated successfully!");
                 window.switchView('view-products', 'Products');
             } catch (err) {
@@ -1864,9 +2418,9 @@
 
             filtered.forEach(inv => {
                 const tr = document.createElement('tr');
-                const badgeClass = inv.status === 'Paid' ? 'badge-success' : (inv.status === 'Unpaid' ? 'badge-danger' : 'badge-neutral');
                 const formattedDate = inv.date || (inv.timestamp ? new Date(inv.timestamp).toLocaleDateString() : '-');
                 const payMethod = inv.paymentMethod || 'Cash';
+                const status = inv.status || 'Draft';
 
                 tr.innerHTML = `
                     <td>
@@ -1879,26 +2433,37 @@
                     </td>
                     <td>${formattedDate}</td>
                     <td><span style="font-size:12.5px; color:var(--text-muted);">${payMethod}</span></td>
-                    <td><span class="badge ${badgeClass}">${inv.status || 'Draft'}</span></td>
+                    <td>
+                        <select class="input-control inv-status-select" data-id="${inv.uniqueId}" style="padding:2px 8px; font-size:11.5px; font-weight:700; width:auto; border-radius:var(--radius-full);">
+                            <option value="Paid" ${status === 'Paid' ? 'selected' : ''}>🟢 Paid</option>
+                            <option value="Unpaid" ${status === 'Unpaid' || status === 'Pending' ? 'selected' : ''}>🟡 Pending</option>
+                            <option value="Overdue" ${status === 'Overdue' ? 'selected' : ''}>🔴 Overdue</option>
+                            <option value="Draft" ${status === 'Draft' ? 'selected' : ''}>⚪ Draft</option>
+                        </select>
+                    </td>
                     <td style="color:var(--primary); font-weight:800; font-size:15px;">$${(inv.totalPrice || 0).toFixed(2)}</td>
                     <td class="text-right">
-                        <button class="btn btn-outline btn-sm view-btn" style="margin-right:6px;">View / Print</button>
-                        <button class="btn btn-danger btn-sm del-btn">Delete</button>
+                        <div style="display:inline-flex; gap:4px;">
+                            <button class="btn btn-outline btn-sm view-btn" title="Preview / Print">View</button>
+                            <button class="btn btn-outline btn-sm copy-btn" onclick="window.duplicateInvoice('${inv.uniqueId}')" title="Duplicate Invoice">Copy</button>
+                            <button class="btn btn-danger btn-sm del-btn" title="Delete Invoice">&times;</button>
+                        </div>
                     </td>
                 `;
                 body.appendChild(tr);
 
                 tr.querySelector('.view-btn').addEventListener('click', () => openInvoicePreviewModal(inv));
+                tr.querySelector('.inv-status-select').addEventListener('change', async (e) => {
+                    const newStatus = e.target.value;
+                    inv.status = newStatus;
+                    await saveInvoice(activeWorkspaceId, inv, false);
+                    showToast(`Status updated to ${newStatus}`);
+                });
+
                 tr.querySelector('.del-btn').addEventListener('click', async () => {
                     if (confirm(`Delete invoice ${inv.invoiceNumber}?`)) {
-                        if (isTestMode) {
-                            invoicesData = invoicesData.filter(i => i.uniqueId !== inv.uniqueId);
-                            refreshAllUI();
-                            showToast("Invoice deleted (Demo Mode)");
-                        } else {
-                            await deleteInvoice(activeWorkspaceId, inv.uniqueId, inv.isBusinessInvoice);
-                            showToast("Invoice deleted");
-                        }
+                        await deleteInvoice(activeWorkspaceId, inv.uniqueId, inv.isBusinessInvoice);
+                        showToast("Invoice deleted");
                     }
                 });
             });
@@ -1929,44 +2494,303 @@
             window.switchView('view-invoice-form', 'Create Invoice');
         };
 
-        document.getElementById('i_type').addEventListener('change', (e) => {
-            const type = e.target.value;
-            document.getElementById('contactTypeBadge').innerText = type === 'business' ? 'Corporate / B2B' : 'Customer';
-            const prefix = type === 'business' ? 'B2B' : 'INV';
-            document.getElementById('i_number').value = `${prefix}-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-            populateInvoiceContactsDropdown();
-        });
+        // Duplicate Invoice Helper
+        window.duplicateInvoice = async function(invoiceId) {
+            const source = invoicesData.find(i => i.uniqueId === invoiceId);
+            if (!source) return;
 
-        function populateInvoiceContactsDropdown() {
-            const type = document.getElementById('i_type').value;
-            const contactSelect = document.getElementById('i_contact_select');
-            contactSelect.innerHTML = '<option value="">-- Choose Existing Contact (Autofills fields) --</option>';
+            const clone = JSON.parse(JSON.stringify(source));
+            clone.uniqueId = generateUniqueId('inv');
+            const prefix = clone.isBusinessInvoice ? 'B2B' : 'INV';
+            clone.invoiceNumber = `${prefix}-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            clone.timestamp = Date.now();
+            clone.date = new Date().toISOString().split('T')[0];
+            clone.status = 'Draft';
 
-            const dataSource = type === 'client' ? clientsData.filter(c => c.isClient !== false) : businessData;
-            dataSource.forEach(contact => {
-                const opt = document.createElement('option');
-                opt.value = contact.uniqueId;
-                opt.innerText = contact.name + (contact.phone ? ` (${contact.phone})` : '');
-                contactSelect.appendChild(opt);
+            await saveInvoice(activeWorkspaceId, clone, true);
+            showToast(`Duplicated invoice as ${clone.invoiceNumber}`);
+        };
+
+        // Invoice Preview / Print Modal & Layouts
+        let activePreviewInvoice = null;
+        let activePreviewLayout = 'standard';
+
+        function renderInvoicePreviewHtml(invoice, layout = 'standard') {
+            const dateStr = invoice.date || (invoice.timestamp ? new Date(invoice.timestamp).toLocaleDateString() : new Date().toLocaleDateString());
+            const wsName = currentWorkspaceInfo ? (currentWorkspaceInfo.name || 'PriceLister Workspace') : 'PriceLister Workspace';
+
+            let itemsRows = '';
+            let subtotal = 0;
+            (invoice.items || []).forEach(item => {
+                const lineTotal = item.total || ((item.quantity || 1) * (item.unitPrice || 0));
+                subtotal += lineTotal;
+                if (layout === 'pos') {
+                    itemsRows += `
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                            <div>${item.quantity}x ${item.name}</div>
+                            <div>$${lineTotal.toFixed(2)}</div>
+                        </div>
+                    `;
+                } else {
+                    itemsRows += `
+                        <tr>
+                            <td><strong>${item.name}</strong></td>
+                            <td>${item.quantity}</td>
+                            <td>$${(item.unitPrice || 0).toFixed(2)}</td>
+                            <td class="text-right">$${lineTotal.toFixed(2)}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            const discount = (subtotal * (invoice.discountPercent || 0)) / 100;
+            const tax = ((subtotal - discount) * (invoice.taxPercent || 0)) / 100;
+            const shipping = invoice.shippingFee || 0;
+            const grandTotal = invoice.totalPrice || (subtotal - discount + tax + shipping);
+
+            if (layout === 'pos') {
+                return `
+                    <div class="pos-receipt-container">
+                        <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:8px; margin-bottom:8px;">
+                            <div style="font-size:16px; font-weight:800;">${wsName.toUpperCase()}</div>
+                            <div style="font-size:10.5px;">${invoice.isBusinessInvoice ? 'COMMERCIAL INVOICE' : 'RETAIL RECEIPT'}</div>
+                            <div style="font-size:10.5px; margin-top:2px;">#${invoice.invoiceNumber} · ${dateStr}</div>
+                        </div>
+
+                        <div style="margin-bottom:8px; font-size:11px;">
+                            <div><strong>Customer:</strong> ${invoice.customerName || 'Walk-in'}</div>
+                            ${invoice.customerNumber ? `<div><strong>Phone:</strong> ${invoice.customerNumber}</div>` : ''}
+                        </div>
+
+                        <div style="border-bottom:1px dashed #000; padding-bottom:8px; margin-bottom:8px;">
+                            ${itemsRows}
+                        </div>
+
+                        <div style="font-size:11.5px; line-height:1.4;">
+                            <div style="display:flex; justify-content:space-between;"><span>Subtotal:</span><span>$${subtotal.toFixed(2)}</span></div>
+                            ${discount ? `<div style="display:flex; justify-content:space-between; color:red;"><span>Discount:</span><span>-$${discount.toFixed(2)}</span></div>` : ''}
+                            ${tax ? `<div style="display:flex; justify-content:space-between;"><span>Tax (${invoice.taxPercent}%):</span><span>+$${tax.toFixed(2)}</span></div>` : ''}
+                            ${shipping ? `<div style="display:flex; justify-content:space-between;"><span>Delivery:</span><span>+$${shipping.toFixed(2)}</span></div>` : ''}
+                            <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:800; border-top:1px solid #000; margin-top:6px; padding-top:4px;">
+                                <span>TOTAL:</span><span>$${grandTotal.toFixed(2)}</span>
+                            </div>
+                        </div>
+
+                        <div style="text-align:center; margin-top:12px; font-size:10px; border-top:1px dashed #000; padding-top:8px;">
+                            <div>Payment: ${invoice.paymentMethod || 'Cash'} · Status: ${invoice.status || 'Paid'}</div>
+                            <div style="margin-top:4px;">Thank you for your business!</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="printable-invoice">
+                    <div class="printable-invoice-header">
+                        <div>
+                            <div style="font-size:22px; font-weight:800; color:var(--primary);">${wsName}</div>
+                            <div style="font-size:12px; color:var(--text-muted);">${invoice.isBusinessInvoice ? 'Corporate B2B Invoice' : 'Customer Retail Invoice'}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:20px; font-weight:800; font-family:var(--font-mono);">${invoice.invoiceNumber}</div>
+                            <div style="font-size:12px; color:var(--text-muted);">Date: ${dateStr}</div>
+                            ${invoice.dueDate ? `<div style="font-size:12px; color:var(--text-muted);">Due: ${invoice.dueDate}</div>` : ''}
+                            <div style="margin-top:4px;"><span class="badge ${invoice.status === 'Paid' ? 'badge-success' : 'badge-danger'}">${invoice.status}</span></div>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:24px; padding:14px; background:#F8FAFC; border-radius:8px; border:1px solid #E2E8F0;">
+                        <div>
+                            <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Billed To:</div>
+                            <div style="font-size:15px; font-weight:700; margin-top:2px;">${invoice.customerName || 'Customer'}</div>
+                            <div style="font-size:13px; color:var(--text-muted);">${invoice.customerNumber || ''}</div>
+                            <div style="font-size:13px; color:var(--text-muted);">${invoice.customerEmail || ''}</div>
+                            <div style="font-size:13px; color:var(--text-muted);">${invoice.customerAddress || ''}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Payment Details:</div>
+                            <div style="font-size:13.5px; font-weight:600; margin-top:2px;">Method: ${invoice.paymentMethod || 'Cash'}</div>
+                            ${invoice.notes ? `<div style="font-size:12px; color:var(--text-muted); margin-top:6px; font-style:italic;">"${invoice.notes}"</div>` : ''}
+                        </div>
+                    </div>
+
+                    <table class="printable-invoice-table">
+                        <thead>
+                            <tr>
+                                <th>Item / Description</th>
+                                <th>Qty</th>
+                                <th>Unit Price</th>
+                                <th class="text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsRows || '<tr><td colspan="4" style="text-align:center;">No items recorded</td></tr>'}
+                        </tbody>
+                    </table>
+
+                    <table class="printable-totals-table">
+                        <tr>
+                            <td>Subtotal:</td>
+                            <td class="text-right" style="font-weight:600;">$${subtotal.toFixed(2)}</td>
+                        </tr>
+                        ${discount ? `
+                        <tr>
+                            <td>Discount (${invoice.discountPercent}%):</td>
+                            <td class="text-right" style="color:var(--danger);">-$${discount.toFixed(2)}</td>
+                        </tr>
+                        ` : ''}
+                        ${tax ? `
+                        <tr>
+                            <td>Tax / VAT (${invoice.taxPercent}%):</td>
+                            <td class="text-right">+$${tax.toFixed(2)}</td>
+                        </tr>
+                        ` : ''}
+                        ${shipping ? `
+                        <tr>
+                            <td>Shipping:</td>
+                            <td class="text-right">+$${shipping.toFixed(2)}</td>
+                        </tr>
+                        ` : ''}
+                        <tr style="border-top:2px solid #CBD5E1; font-size:16px; font-weight:800;">
+                            <td>Grand Total:</td>
+                            <td class="text-right" style="color:var(--primary);">$${grandTotal.toFixed(2)}</td>
+                        </tr>
+                    </table>
+                </div>
+            `;
+        }
+
+        window.openInvoicePreviewModal = function(invoice) {
+            activePreviewInvoice = invoice;
+            activePreviewLayout = 'standard';
+            const previewModal = document.getElementById('invoicePreviewModal');
+            const previewContent = document.getElementById('invoicePreviewContent');
+            const printContainer = document.getElementById('invoicePrintContainer');
+
+            const html = renderInvoicePreviewHtml(invoice, 'standard');
+            previewContent.innerHTML = html;
+            printContainer.innerHTML = html;
+            previewModal.classList.add('active');
+        };
+
+        window.switchInvoicePreviewLayout = function(layout) {
+            if (!activePreviewInvoice) return;
+            activePreviewLayout = layout;
+            const previewContent = document.getElementById('invoicePreviewContent');
+            const printContainer = document.getElementById('invoicePrintContainer');
+
+            document.getElementById('btnInvViewStandard').style.background = layout === 'standard' ? '#fff' : 'transparent';
+            document.getElementById('btnInvViewStandard').style.color = layout === 'standard' ? 'var(--text-main)' : 'var(--text-muted)';
+            document.getElementById('btnInvViewPOS').style.background = layout === 'pos' ? '#fff' : 'transparent';
+            document.getElementById('btnInvViewPOS').style.color = layout === 'pos' ? 'var(--text-main)' : 'var(--text-muted)';
+
+            const html = renderInvoicePreviewHtml(activePreviewInvoice, layout);
+            previewContent.innerHTML = html;
+            printContainer.innerHTML = html;
+        };
+
+        // Copy plain text invoice summary
+        const copySummaryBtn = document.getElementById('copyInvoiceTextBtn');
+        if (copySummaryBtn) {
+            copySummaryBtn.addEventListener('click', () => {
+                if (!activePreviewInvoice) return;
+                const inv = activePreviewInvoice;
+                let summary = `🧾 *INVOICE #${inv.invoiceNumber}*\n`;
+                summary += `Customer: ${inv.customerName || 'Customer'}\n`;
+                summary += `Date: ${inv.date || 'Today'}\n`;
+                summary += `------------------------\n`;
+                (inv.items || []).forEach(i => {
+                    summary += `• ${i.name} x ${i.quantity} @ $${(i.unitPrice || 0).toFixed(2)} = $${((i.quantity || 1) * (i.unitPrice || 0)).toFixed(2)}\n`;
+                });
+                summary += `------------------------\n`;
+                summary += `*Grand Total: $${(inv.totalPrice || 0).toFixed(2)}*\n`;
+                summary += `Status: ${inv.status || 'Paid'} | Method: ${inv.paymentMethod || 'Cash'}\n`;
+
+                navigator.clipboard.writeText(summary).then(() => {
+                    showToast("Invoice summary copied to clipboard!");
+                }).catch(() => {
+                    showToast("Failed to copy to clipboard", "error");
+                });
             });
         }
 
-        // Contact Select Autofill
-        document.getElementById('i_contact_select').addEventListener('change', (e) => {
-            const contactId = e.target.value;
-            if (!contactId) return;
+        // ================= CSV EXPORT UTILITIES =================
+        function downloadCSV(filename, csvContent) {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast(`Exported ${filename}`);
+        }
 
-            const type = document.getElementById('i_type').value;
-            const dataSource = type === 'client' ? clientsData : businessData;
-            const contact = dataSource.find(c => c.uniqueId === contactId);
-
-            if (contact) {
-                document.getElementById('i_cust_name').value = contact.name || '';
-                document.getElementById('i_cust_phone').value = contact.phone || '';
-                document.getElementById('i_cust_email').value = contact.email || '';
-                document.getElementById('i_cust_address').value = contact.address || '';
+        window.exportProductsCSV = function() {
+            if (productsData.length === 0) {
+                showToast("No products to export", "info");
+                return;
             }
-        });
+            let csv = "Unique ID,Name,Category,Stock Quantity,Cost Price,Sale Price,MRP,UPC Code,Size/Weight,Variations Count\n";
+            productsData.forEach(p => {
+                const varCount = p.variations ? p.variations.length : 0;
+                csv += `"${p.uniqueId}","${(p.name || '').replace(/"/g, '""')}","${getCategoryName(p.category)}",${p.quantity || 0},${p.price || 0},${p.salePrice || 0},${p.mrp || 0},"${p.upcCode || ''}","${p.sizeWeight || ''}",${varCount}\n`;
+            });
+            downloadCSV(`PriceLister_Products_${new Date().toISOString().split('T')[0]}.csv`, csv);
+        };
+
+        window.exportInvoicesCSV = function() {
+            if (invoicesData.length === 0) {
+                showToast("No invoices to export", "info");
+                return;
+            }
+            let csv = "Invoice Number,Type,Customer Name,Phone,Date,Payment Method,Status,Subtotal,Discount,Tax,Shipping,Grand Total\n";
+            invoicesData.forEach(inv => {
+                const typeStr = inv.isBusinessInvoice ? 'Corporate B2B' : 'Retail Customer';
+                csv += `"${inv.invoiceNumber}","${typeStr}","${(inv.customerName || '').replace(/"/g, '""')}","${inv.customerNumber || ''}","${inv.date || ''}","${inv.paymentMethod || 'Cash'}","${inv.status || 'Draft'}",${inv.subtotal || 0},${inv.discountPercent || 0},${inv.taxPercent || 0},${inv.shippingFee || 0},${inv.totalPrice || 0}\n`;
+            });
+            downloadCSV(`PriceLister_Invoices_${new Date().toISOString().split('T')[0]}.csv`, csv);
+        };
+
+        window.exportCategoriesCSV = function() {
+            if (categoriesData.length === 0) {
+                showToast("No categories to export", "info");
+                return;
+            }
+            let csv = "Unique ID,Category Name,Color Hex,Associated Products Count\n";
+            categoriesData.forEach(c => {
+                const count = productsData.filter(p => p.category === c.uniqueId || p.category === c.name).length;
+                csv += `"${c.uniqueId}","${(c.name || '').replace(/"/g, '""')}","${c.color || '#E11D48'}",${count}\n`;
+            });
+            downloadCSV(`PriceLister_Categories_${new Date().toISOString().split('T')[0]}.csv`, csv);
+        };
+
+        window.exportClientsCSV = function() {
+            if (clientsData.length === 0) {
+                showToast("No clients to export", "info");
+                return;
+            }
+            let csv = "Unique ID,Classification,Name,Phone,Email,Address\n";
+            clientsData.forEach(c => {
+                const typeStr = c.isClient !== false ? 'Client (Wholesale)' : 'Customer (Retail)';
+                csv += `"${c.uniqueId}","${typeStr}","${(c.name || '').replace(/"/g, '""')}","${c.phone || ''}","${c.email || ''}","${(c.address || '').replace(/"/g, '""')}"\n`;
+            });
+            downloadCSV(`PriceLister_Contacts_${new Date().toISOString().split('T')[0]}.csv`, csv);
+        };
+
+        window.exportBusinessCSV = function() {
+            if (businessData.length === 0) {
+                showToast("No business profiles to export", "info");
+                return;
+            }
+            let csv = "Unique ID,Business Name,Contact Person,Phone,Email,Tax ID,Address\n";
+            businessData.forEach(b => {
+                csv += `"${b.uniqueId}","${(b.name || '').replace(/"/g, '""')}","${b.contactPerson || ''}","${b.phone || ''}","${b.email || ''}","${b.taxNumber || ''}","${(b.address || '').replace(/"/g, '""')}"\n`;
+            });
+            downloadCSV(`PriceLister_Businesses_${new Date().toISOString().split('T')[0]}.csv`, csv);
+        };
 
         // Add Line Item in Invoice
         function addInvoiceLineItem(name = '', qty = 1, price = 0, cost = 0, disc = 0) {
@@ -2094,8 +2918,8 @@
             const custAddress = document.getElementById('i_cust_address').value.trim();
             const type = document.getElementById('i_type').value;
 
-            if (!invoiceNumber || !custName || !custPhone) {
-                showToast("Invoice Number, Customer Name, and Phone are required (*)", "error");
+            if (!invoiceNumber || !custName) {
+                showToast("Invoice Number and Customer Name are required (*)", "error");
                 return;
             }
 
@@ -2125,7 +2949,7 @@
             const profit = Math.max(0, grandTotal - totalCost);
 
             const isNew = !editingInvoiceId;
-            const uniqueId = isNew ? `inv_${Date.now()}` : editingInvoiceId;
+            const uniqueId = isNew ? generateUniqueId('inv') : editingInvoiceId;
             const existingInv = editingInvoiceId ? (invoicesData.find(i => i.uniqueId === editingInvoiceId) || {}) : {};
 
             const invoiceObj = {
@@ -2157,13 +2981,8 @@
             btn.disabled = true;
 
             try {
-                if (isTestMode) {
-                    invoicesData.push(invoiceObj);
-                    refreshAllUI();
-                } else {
-                    await saveInvoice(activeWorkspaceId, invoiceObj, isNew);
-                }
-                showToast("Invoice created successfully!");
+                await saveInvoice(activeWorkspaceId, invoiceObj, isNew);
+                showToast("Invoice saved successfully!");
                 window.switchView('view-invoices', 'Invoices');
             } catch (err) {
                 console.error("Save invoice failed:", err);
@@ -2172,125 +2991,6 @@
                 btn.innerText = 'Save & Finalize Invoice';
                 btn.disabled = false;
             }
-        });
-
-        // Invoice Preview / Print Modal
-        function openInvoicePreviewModal(invoice) {
-            const previewModal = document.getElementById('invoicePreviewModal');
-            const previewContent = document.getElementById('invoicePreviewContent');
-            const printContainer = document.getElementById('invoicePrintContainer');
-
-            const dateStr = invoice.date || (invoice.timestamp ? new Date(invoice.timestamp).toLocaleDateString() : new Date().toLocaleDateString());
-            const wsName = currentWorkspaceInfo ? (currentWorkspaceInfo.name || 'PriceLister Workspace') : 'PriceLister Workspace';
-
-            let itemsRows = '';
-            let subtotal = 0;
-            (invoice.items || []).forEach(item => {
-                const lineTotal = item.total || ((item.quantity || 1) * (item.unitPrice || 0));
-                subtotal += lineTotal;
-                itemsRows += `
-                    <tr>
-                        <td><strong>${item.name}</strong></td>
-                        <td>${item.quantity}</td>
-                        <td>$${(item.unitPrice || 0).toFixed(2)}</td>
-                        <td class="text-right">$${lineTotal.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-
-            const discount = (subtotal * (invoice.discountPercent || 0)) / 100;
-            const tax = ((subtotal - discount) * (invoice.taxPercent || 0)) / 100;
-            const shipping = invoice.shippingFee || 0;
-            const grandTotal = invoice.totalPrice || (subtotal - discount + tax + shipping);
-
-            const templateHtml = `
-                <div class="printable-invoice">
-                    <div class="printable-invoice-header">
-                        <div>
-                            <div style="font-size:22px; font-weight:800; color:var(--primary);">${wsName}</div>
-                            <div style="font-size:12px; color:var(--text-muted);">${invoice.isBusinessInvoice ? 'Corporate B2B Invoice' : 'Customer Retail Invoice'}</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-size:20px; font-weight:800; font-family:var(--font-mono);">${invoice.invoiceNumber}</div>
-                            <div style="font-size:12px; color:var(--text-muted);">Date: ${dateStr}</div>
-                            ${invoice.dueDate ? `<div style="font-size:12px; color:var(--text-muted);">Due: ${invoice.dueDate}</div>` : ''}
-                            <div style="margin-top:4px;"><span class="badge ${invoice.status === 'Paid' ? 'badge-success' : 'badge-danger'}">${invoice.status}</span></div>
-                        </div>
-                    </div>
-
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:24px; padding:14px; background:#F8FAFC; border-radius:8px; border:1px solid #E2E8F0;">
-                        <div>
-                            <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Billed To:</div>
-                            <div style="font-size:15px; font-weight:700; margin-top:2px;">${invoice.customerName || 'Customer'}</div>
-                            <div style="font-size:13px; color:var(--text-muted);">${invoice.customerNumber || ''}</div>
-                            <div style="font-size:13px; color:var(--text-muted);">${invoice.customerEmail || ''}</div>
-                            <div style="font-size:13px; color:var(--text-muted);">${invoice.customerAddress || ''}</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Payment Details:</div>
-                            <div style="font-size:13.5px; font-weight:600; margin-top:2px;">Method: ${invoice.paymentMethod || 'Cash'}</div>
-                            ${invoice.notes ? `<div style="font-size:12px; color:var(--text-muted); margin-top:6px; font-style:italic;">"${invoice.notes}"</div>` : ''}
-                        </div>
-                    </div>
-
-                    <table class="printable-invoice-table">
-                        <thead>
-                            <tr>
-                                <th>Item / Description</th>
-                                <th>Qty</th>
-                                <th>Unit Price</th>
-                                <th class="text-right">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsRows || '<tr><td colspan="4" style="text-align:center;">No items recorded</td></tr>'}
-                        </tbody>
-                    </table>
-
-                    <table class="printable-totals-table">
-                        <tr>
-                            <td>Subtotal:</td>
-                            <td class="text-right" style="font-weight:600;">$${subtotal.toFixed(2)}</td>
-                        </tr>
-                        ${invoice.discountPercent ? `
-                        <tr>
-                            <td>Discount (${invoice.discountPercent}%):</td>
-                            <td class="text-right" style="color:var(--danger);">-$${discount.toFixed(2)}</td>
-                        </tr>
-                        ` : ''}
-                        ${invoice.taxPercent ? `
-                        <tr>
-                            <td>Tax / VAT (${invoice.taxPercent}%):</td>
-                            <td class="text-right">+$${tax.toFixed(2)}</td>
-                        </tr>
-                        ` : ''}
-                        ${invoice.shippingFee ? `
-                        <tr>
-                            <td>Shipping:</td>
-                            <td class="text-right">+$${shipping.toFixed(2)}</td>
-                        </tr>
-                        ` : ''}
-                        <tr style="border-top:2px solid #CBD5E1; font-size:16px; font-weight:800;">
-                            <td>Grand Total:</td>
-                            <td class="text-right" style="color:var(--primary);">$${grandTotal.toFixed(2)}</td>
-                        </tr>
-                    </table>
-                </div>
-            `;
-
-            previewContent.innerHTML = templateHtml;
-            printContainer.innerHTML = templateHtml;
-            previewModal.classList.add('active');
-        }
-
-        document.getElementById('closeInvoicePreviewModal').addEventListener('click', () => {
-            document.getElementById('invoicePreviewModal').classList.remove('active');
-        });
-        document.getElementById('closeInvoiceModalBtn').addEventListener('click', () => {
-            document.getElementById('invoicePreviewModal').classList.remove('active');
-        });
-        document.getElementById('printInvoiceBtn').addEventListener('click', () => {
-            window.print();
         });
 
         // ================= 4. CATEGORIES LOGIC =================
@@ -2337,17 +3037,11 @@
                 `;
                 body.appendChild(tr);
 
-                tr.querySelector('.edit-btn').addEventListener('click', () => openCategoryForm(cat));
+                tr.querySelector('.edit-btn').addEventListener('click', () => window.openCategoryForm(cat));
                 tr.querySelector('.del-btn').addEventListener('click', async () => {
                     if (confirm(`Delete category "${cat.name}"?`)) {
-                        if (isTestMode) {
-                            categoriesData = categoriesData.filter(c => c.uniqueId !== cat.uniqueId);
-                            refreshAllUI();
-                            showToast("Category deleted");
-                        } else {
-                            await deleteCategory(activeWorkspaceId, cat.uniqueId);
-                            showToast("Category deleted");
-                        }
+                        await deleteCategory(activeWorkspaceId, cat.uniqueId);
+                        showToast("Category deleted");
                     }
                 });
             });
@@ -2361,7 +3055,7 @@
             if (!name) return showToast("Category Name is required.", "error");
 
             const isNew = !editingCategoryId;
-            const uniqueId = isNew ? `cat_${Date.now()}` : editingCategoryId;
+            const uniqueId = isNew ? generateUniqueId('cat') : editingCategoryId;
             const existingCat = editingCategoryId ? (categoriesData.find(c => c.uniqueId === editingCategoryId) || {}) : {};
 
             const catObj = {
@@ -2372,35 +3066,45 @@
                 timestamp: isNew ? Date.now() : (existingCat.timestamp || Date.now())
             };
 
-            if (isTestMode) {
-                if (isNew) categoriesData.push(catObj);
-                else {
-                    const idx = categoriesData.findIndex(c => c.uniqueId === uniqueId);
-                    if (idx >= 0) categoriesData[idx] = catObj;
-                }
-                refreshAllUI();
-            } else {
-                await saveCategory(activeWorkspaceId, catObj, isNew);
-            }
+            await saveCategory(activeWorkspaceId, catObj, isNew);
             showToast("Category saved successfully!");
             window.switchView('view-categories', 'Categories');
         });
 
-        // ================= 5. CLIENTS LOGIC (isClient = true) =================
+        // ================= 5. CLIENTS & CUSTOMERS LOGIC (isClient = true vs false) =================
+        window.filterClientsType = function(type) {
+            currentClientFilter = type;
+            document.getElementById('btn-client-filter-all').style.background = type === 'all' ? '#fff' : 'transparent';
+            document.getElementById('btn-client-filter-all').style.boxShadow = type === 'all' ? 'var(--shadow-sm)' : 'none';
+            document.getElementById('btn-client-filter-all').style.color = type === 'all' ? 'var(--text-main)' : 'var(--text-muted)';
+
+            document.getElementById('btn-client-filter-client').style.background = type === 'client' ? '#fff' : 'transparent';
+            document.getElementById('btn-client-filter-client').style.boxShadow = type === 'client' ? 'var(--shadow-sm)' : 'none';
+            document.getElementById('btn-client-filter-client').style.color = type === 'client' ? 'var(--text-main)' : 'var(--text-muted)';
+
+            document.getElementById('btn-client-filter-customer').style.background = type === 'customer' ? '#fff' : 'transparent';
+            document.getElementById('btn-client-filter-customer').style.boxShadow = type === 'customer' ? 'var(--shadow-sm)' : 'none';
+            document.getElementById('btn-client-filter-customer').style.color = type === 'customer' ? 'var(--text-main)' : 'var(--text-muted)';
+
+            renderClientsList();
+        };
+
         window.openClientForm = function(client = null) {
             document.getElementById('clientForm').reset();
             if (client) {
-                document.getElementById('clientFormTitle').innerText = 'Edit Client';
+                document.getElementById('clientFormTitle').innerText = client.isClient ? 'Edit Client' : 'Edit Customer';
                 editingClientId = client.uniqueId;
+                document.getElementById('cl_type').value = client.isClient !== false ? 'true' : 'false';
                 document.getElementById('cl_name').value = client.name || '';
                 document.getElementById('cl_phone').value = client.phone || '';
                 document.getElementById('cl_email').value = client.email || '';
                 document.getElementById('cl_address').value = client.address || '';
             } else {
-                document.getElementById('clientFormTitle').innerText = 'Add Client';
+                document.getElementById('clientFormTitle').innerText = 'Add Client / Customer';
                 editingClientId = null;
+                document.getElementById('cl_type').value = 'true';
             }
-            window.switchView('view-client-form', client ? 'Edit Client' : 'Add Client');
+            window.switchView('view-client-form', client ? 'Edit Contact' : 'Add Contact');
         };
 
         function renderClientsList() {
@@ -2408,23 +3112,35 @@
             body.innerHTML = '';
 
             const searchTerm = (document.getElementById('clientSearchInput').value || '').toLowerCase();
-            const filtered = clientsData.filter(c => 
-                c.isClient !== false && (
-                    (c.name || '').toLowerCase().includes(searchTerm) ||
-                    (c.phone || '').toLowerCase().includes(searchTerm) ||
-                    (c.email || '').toLowerCase().includes(searchTerm)
-                )
-            );
+            const filtered = clientsData.filter(c => {
+                const matchesType = currentClientFilter === 'all' ? true :
+                                    currentClientFilter === 'client' ? (c.isClient === true) :
+                                    (c.isClient === false);
+                const matchesSearch = (c.name || '').toLowerCase().includes(searchTerm) ||
+                                      (c.phone || '').toLowerCase().includes(searchTerm) ||
+                                      (c.email || '').toLowerCase().includes(searchTerm);
+                return matchesType && matchesSearch;
+            });
 
             if (filtered.length === 0) {
-                body.innerHTML = `<tr><td colspan="5" class="empty-state">No clients found.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="5" class="empty-state">No contacts found in this category.</td></tr>`;
                 return;
             }
 
             filtered.forEach(client => {
                 const tr = document.createElement('tr');
+                const isCl = client.isClient !== false;
+                const typeBadge = isCl 
+                    ? `<span class="badge badge-primary" style="font-size:11px; margin-left:6px;">🏢 Client</span>` 
+                    : `<span class="badge badge-neutral" style="font-size:11px; margin-left:6px;">👤 Customer</span>`;
+
                 tr.innerHTML = `
-                    <td><strong>${client.name}</strong></td>
+                    <td>
+                        <div style="display:flex; align-items:center;">
+                            <strong>${client.name}</strong>
+                            ${typeBadge}
+                        </div>
+                    </td>
                     <td>
                         <a href="tel:${client.phone}" style="font-weight:600;">${client.phone}</a>
                     </td>
@@ -2437,17 +3153,12 @@
                 `;
                 body.appendChild(tr);
 
-                tr.querySelector('.edit-btn').addEventListener('click', () => openClientForm(client));
+                tr.querySelector('.edit-btn').addEventListener('click', () => window.openClientForm(client));
                 tr.querySelector('.del-btn').addEventListener('click', async () => {
-                    if (confirm(`Delete client "${client.name}"?`)) {
-                        if (isTestMode) {
-                            clientsData = clientsData.filter(c => c.uniqueId !== client.uniqueId);
-                            refreshAllUI();
-                            showToast("Client removed");
-                        } else {
-                            await deleteClient(activeWorkspaceId, client.uniqueId);
-                            showToast("Client removed");
-                        }
+                    const typeLabel = isCl ? 'client' : 'customer';
+                    if (confirm(`Delete ${typeLabel} "${client.name}"?`)) {
+                        await deleteClient(activeWorkspaceId, client.uniqueId);
+                        showToast("Contact removed");
                     }
                 });
             });
@@ -2460,11 +3171,12 @@
             const phone = document.getElementById('cl_phone').value.trim();
             const email = document.getElementById('cl_email').value.trim();
             const address = document.getElementById('cl_address').value.trim();
+            const isClient = document.getElementById('cl_type').value === 'true';
 
-            if (!name || !phone) return showToast("Client Name and Phone are required.", "error");
+            if (!name || !phone) return showToast("Contact Name and Phone are required.", "error");
 
             const isNew = !editingClientId;
-            const uniqueId = isNew ? `cl_${Date.now()}` : editingClientId;
+            const uniqueId = isNew ? generateUniqueId('cl') : editingClientId;
             const existingClient = editingClientId ? (clientsData.find(c => c.uniqueId === editingClientId) || {}) : {};
 
             const clientObj = {
@@ -2474,22 +3186,12 @@
                 phone,
                 email,
                 address,
-                isClient: true,
+                isClient: isClient,
                 timestamp: isNew ? Date.now() : (existingClient.timestamp || Date.now())
             };
 
-            if (isTestMode) {
-                if (isNew) clientsData.push(clientObj);
-                else {
-                    const idx = clientsData.findIndex(c => c.uniqueId === uniqueId);
-                    if (idx >= 0) clientsData[idx] = clientObj;
-                }
-                refreshAllUI();
-            } else {
-                await saveClient(activeWorkspaceId, clientObj, isNew);
-            }
-
-            showToast("Client saved successfully!");
+            await saveClient(activeWorkspaceId, clientObj, isNew);
+            showToast(`${isClient ? 'Client' : 'Customer'} saved successfully!`);
             window.switchView('view-clients', 'Clients');
         });
 
@@ -2539,17 +3241,11 @@
                 `;
                 body.appendChild(tr);
 
-                tr.querySelector('.edit-btn').addEventListener('click', () => openBusinessForm(biz));
+                tr.querySelector('.edit-btn').addEventListener('click', () => window.openBusinessForm(biz));
                 tr.querySelector('.del-btn').addEventListener('click', async () => {
                     if (confirm(`Delete profile "${biz.name}"?`)) {
-                        if (isTestMode) {
-                            businessData = businessData.filter(b => b.uniqueId !== biz.uniqueId);
-                            refreshAllUI();
-                            showToast("Business profile deleted");
-                        } else {
-                            await deleteBusinessProfile(activeWorkspaceId, biz.uniqueId);
-                            showToast("Business profile deleted");
-                        }
+                        await deleteBusinessProfile(activeWorkspaceId, biz.uniqueId);
+                        showToast("Business profile deleted");
                     }
                 });
             });
@@ -2566,7 +3262,7 @@
             if (!name || !phone) return showToast("Company Name and Phone are required.", "error");
 
             const isNew = !editingBusinessId;
-            const uniqueId = isNew ? `bz_${Date.now()}` : editingBusinessId;
+            const uniqueId = isNew ? generateUniqueId('bz') : editingBusinessId;
             const existingBiz = editingBusinessId ? (businessData.find(b => b.uniqueId === editingBusinessId) || {}) : {};
 
             const bizObj = {
@@ -2579,22 +3275,12 @@
                 timestamp: isNew ? Date.now() : (existingBiz.timestamp || Date.now())
             };
 
-            if (isTestMode) {
-                if (isNew) businessData.push(bizObj);
-                else {
-                    const idx = businessData.findIndex(b => b.uniqueId === uniqueId);
-                    if (idx >= 0) businessData[idx] = bizObj;
-                }
-                refreshAllUI();
-            } else {
-                await saveBusinessProfile(activeWorkspaceId, bizObj, isNew);
-            }
-
+            await saveBusinessProfile(activeWorkspaceId, bizObj, isNew);
             showToast("Business profile saved successfully!");
             window.switchView('view-business', 'Business Profiles');
         });
 
-        // ================= 7. WORKSPACE & MEMBERS =================
+        // ================= 7. WORKSPACE & MEMBERS (RBAC: Admin, Co-Admin, Worker) =================
         function renderWorkersList() {
             const body = document.getElementById('workersBody');
             body.innerHTML = '';
@@ -2624,6 +3310,23 @@
             workersData.forEach(worker => {
                 const tr = document.createElement('tr');
                 const isRestricted = Boolean(worker.isRestricted);
+                
+                // Permission checks:
+                // Admin: can toggle restriction & delete workers
+                // Co-admin: can toggle restriction on workers, but CANNOT delete workers
+                // Worker: view-only (no actions)
+                let actionHtml = `<span style="color:var(--text-subtle);font-size:12px;">View Only</span>`;
+                if (isAdmin) {
+                    actionHtml = `
+                        <button class="btn btn-outline btn-sm toggle-btn" style="margin-right:6px;">${isRestricted ? 'Grant Access' : 'Restrict'}</button>
+                        <button class="btn btn-danger btn-sm del-btn">&times;</button>
+                    `;
+                } else if (isCoAdmin) {
+                    actionHtml = `
+                        <button class="btn btn-outline btn-sm toggle-btn">${isRestricted ? 'Grant Access' : 'Restrict'}</button>
+                    `;
+                }
+
                 tr.innerHTML = `
                     <td>
                         <strong>${worker.name || worker.email}</strong>
@@ -2632,41 +3335,70 @@
                     <td><span style="font-family:var(--font-mono);font-size:12px;">${worker.appWorkerId || '-'}</span></td>
                     <td><span class="badge badge-neutral">${worker.role || 'Staff'}</span></td>
                     <td><span class="badge ${isRestricted ? 'badge-warning' : 'badge-success'}">${isRestricted ? 'Restricted' : 'Full Access'}</span></td>
-                    <td class="text-right">
-                        <button class="btn btn-outline btn-sm toggle-btn" style="margin-right:6px;">${isRestricted ? 'Grant Access' : 'Restrict'}</button>
-                        <button class="btn btn-danger btn-sm del-btn">&times;</button>
-                    </td>
+                    <td class="text-right">${actionHtml}</td>
                 `;
                 body.appendChild(tr);
 
-                tr.querySelector('.toggle-btn').addEventListener('click', async () => {
-                    const newStatus = !isRestricted;
-                    if (isTestMode) {
-                        worker.isRestricted = newStatus;
-                        renderWorkersList();
-                        showToast(`Updated member access privilege`);
-                    } else {
+                const toggleBtn = tr.querySelector('.toggle-btn');
+                if (toggleBtn) {
+                    toggleBtn.addEventListener('click', async () => {
+                        const newStatus = !isRestricted;
                         await toggleWorkerRestriction(activeWorkspaceId, worker.uniqueId || worker.appWorkerId, newStatus);
                         showToast(`Updated member privilege`);
-                    }
-                });
+                    });
+                }
 
-                tr.querySelector('.del-btn').addEventListener('click', async () => {
-                    if (confirm(`Remove ${worker.email} from workspace?`)) {
-                        if (isTestMode) {
-                            workersData = workersData.filter(w => w.uniqueId !== worker.uniqueId);
-                            renderWorkersList();
-                            showToast("Team member removed");
-                        } else {
+                const delBtn = tr.querySelector('.del-btn');
+                if (delBtn) {
+                    delBtn.addEventListener('click', async () => {
+                        if (confirm(`Remove ${worker.email} from workspace?`)) {
                             await deleteWorker(activeWorkspaceId, worker.uniqueId || worker.appWorkerId);
                             showToast("Team member removed");
                         }
-                    }
-                });
+                    });
+                }
             });
         }
 
-        // Add Member Modal Controls
+        // Edit Workspace Modal Controls (Admin only)
+        const editWsModal = document.getElementById('editWorkspaceModal');
+        const openEditWsModalBtn = document.getElementById('openEditWsModalBtn');
+        if (openEditWsModalBtn) {
+            openEditWsModalBtn.addEventListener('click', () => {
+                if (currentWorkspaceInfo) {
+                    document.getElementById('ws_edit_name').value = currentWorkspaceInfo.name || '';
+                    document.getElementById('ws_edit_desc').value = currentWorkspaceInfo.description || '';
+                }
+                editWsModal.classList.add('active');
+            });
+        }
+        document.getElementById('closeEditWsModalBtn').addEventListener('click', () => editWsModal.classList.remove('active'));
+        document.getElementById('cancelEditWsModalBtn').addEventListener('click', () => editWsModal.classList.remove('active'));
+
+        document.getElementById('saveEditWsBtn').addEventListener('click', async () => {
+            const name = document.getElementById('ws_edit_name').value.trim();
+            const desc = document.getElementById('ws_edit_desc').value.trim();
+
+            if (!name) return showToast("Workspace Name is required", "error");
+
+            const btn = document.getElementById('saveEditWsBtn');
+            btn.innerText = 'Updating...';
+            btn.disabled = true;
+
+            try {
+                await updateWorkspace(activeWorkspaceId, { name, description: desc });
+                editWsModal.classList.remove('active');
+                showToast("Workspace updated successfully!");
+            } catch (err) {
+                console.error("Update workspace error:", err);
+                showToast("Failed to update workspace", "error");
+            } finally {
+                btn.innerText = 'Update Workspace';
+                btn.disabled = false;
+            }
+        });
+
+        // Add Member Modal Controls (Admin only)
         const addMemberModal = document.getElementById('addMemberModal');
         document.getElementById('openInviteModalBtn').addEventListener('click', () => {
             document.getElementById('addMemberForm').reset();
@@ -2687,7 +3419,7 @@
             }
 
             const workerData = {
-                uniqueId: `wrk_${Date.now()}`,
+                uniqueId: generateUniqueId('wrk'),
                 appWorkerId: `WRK-${Math.floor(1000 + Math.random() * 9000)}`,
                 email,
                 name: name || email.split('@')[0],
@@ -2695,29 +3427,14 @@
                 isRestricted
             };
 
-            if (isTestMode) {
-                workersData.push(workerData);
-                renderWorkersList();
-            } else {
-                await addWorker(activeWorkspaceId, workerData);
-            }
-
+            await addWorker(activeWorkspaceId, workerData);
             addMemberModal.classList.remove('active');
             showToast(`Added ${email} to workspace team!`);
         });
 
-        // Create Workspace Modal Controls
-        const createWsModal = document.getElementById('createWorkspaceModal');
-        document.getElementById('openCreateWsModalBtn').addEventListener('click', () => {
-            document.getElementById('createWorkspaceForm').reset();
-            createWsModal.classList.add('active');
-        });
-        document.getElementById('closeWsModalBtn').addEventListener('click', () => createWsModal.classList.remove('active'));
-        document.getElementById('cancelWsModalBtn').addEventListener('click', () => createWsModal.classList.remove('active'));
-
+        // Create Workspace Modal Controls (Only for new unconnected users)
         document.getElementById('saveNewWsBtn').addEventListener('click', async () => {
             const wsName = document.getElementById('ws_new_name').value.trim();
-            const currency = document.getElementById('ws_new_currency').value;
             const desc = document.getElementById('ws_new_desc').value.trim();
 
             if (!wsName) {
@@ -2730,21 +3447,13 @@
             saveBtn.disabled = true;
 
             try {
-                if (isTestMode) {
-                    currentWorkspaceInfo = { name: wsName, description: desc, adminEmail: currentUser.email };
-                    document.getElementById('topWsName').innerText = wsName;
-                    document.getElementById('wsHeaderName').innerText = wsName;
-                } else {
-                    await createWorkspace(currentUser.uid, {
-                        name: wsName,
-                        description: desc,
-                        adminEmail: currentUser.email,
-                        currency
-                    });
-                    activeWorkspaceId = currentUser.uid;
-                    await initRealtimeWorkspace(currentUser.uid, currentUser.email);
-                }
-                createWsModal.classList.remove('active');
+                await createWorkspace(currentUser.uid, {
+                    name: wsName,
+                    description: desc,
+                    adminEmail: currentUser.email
+                });
+                await initRealtimeWorkspace(currentUser.uid, currentUser.email, currentUser.displayName);
+                document.getElementById('createWorkspaceModal').classList.remove('active');
                 showToast(`Workspace "${wsName}" created successfully!`);
             } catch (err) {
                 console.error("Create workspace failed:", err);
